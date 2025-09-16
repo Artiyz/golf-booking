@@ -1,0 +1,17 @@
+@import "tailwindcss";
+@reference "tailwindcss";
+
+.input { @apply w-full rounded-xl border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600; }
+.btn { @apply inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-white font-medium hover:bg-blue-700 active:scale-[.99]; }
+.btn-secondary { @apply inline-flex items-center gap-2 rounded-xl bg-gray-200 px-4 py-2 text-gray-900 hover:bg-gray-300; }
+.card { @apply text-left rounded-2xl border bg-white p-4 shadow-sm hover:shadow transition; }
+.chip { @apply rounded-full border px-3 py-1 text-sm bg-white hover:bg-gray-100; }
+.btn-danger { @apply inline-flex items-center gap-2 rounded-xl bg-red-600 px-3 py-2 text-white font-medium hover:bg-red-700 active:scale-[.99]; }
+.badge { @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium border; }
+.badge-green { @apply border-green-200 text-green-700 bg-green-50; }
+.badge-gray { @apply border-gray-200 text-gray-700 bg-gray-50; }
+.badge-red { @apply border-red-200 text-red-700 bg-red-50; }
+.badge{ @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium border; }
+.badge-green{ @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium border border-green-200 text-green-700 bg-green-50; }
+.badge-gray{ @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium border border-gray-200 text-gray-700 bg-gray-50; }
+.badge-red{ @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium border border-red-200 text-red-700 bg-red-50; }

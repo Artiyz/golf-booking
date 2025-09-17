@@ -1,93 +1,84 @@
 "use client";
+
+import { useMemo, useState } from "react";
+import { format } from "date-fns";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
-import { format } from "date-fns";
-import { useMemo, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
-type Row = {
+type Booking = {
   id: string;
-  status: "CONFIRMED" | "CANCELED";
-  confirmationCode: string;
   startTime: string;
   endTime: string;
+  status: "CONFIRMED" | "CANCELED";
+  confirmationCode: string;
+  customer: { fullName: string; email: string };
   bay: { name: string };
   service: { name: string; durationMinutes: number };
-  customer: { fullName: string; email: string };
 };
 
 export default function AdminPage() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const dateStr = useMemo(() => format(selectedDate, "yyyy-MM-dd"), [selectedDate]);
 
-  const queryClient = useQueryClient();
-  const { data } = useQuery({
+  const qc = useQueryClient();
+  const { data: bookings = [], isLoading } = useQuery({
     queryKey: ["adminBookings", dateStr],
     queryFn: async () => {
       const r = await fetch(`/api/admin/bookings?date=${dateStr}`);
       const j = await r.json();
-      return (j.bookings || []) as Row[];
+      return j.bookings as Booking[];
     },
   });
 
-  const cancelMut = useMutation({
-    mutationFn: async (id: string) => {
-      const r = await fetch(`/api/bookings/${id}`, { method: "POST" });
-      if (!r.ok) throw new Error("cancel failed");
-      return r.json();
-    },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["adminBookings", dateStr] }),
-  });
+  async function cancel(id: string) {
+    await fetch(`/api/bookings/${id}`, { method: "POST" });
+    qc.invalidateQueries({ queryKey: ["adminBookings", dateStr] });
+  }
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
-      <header className="card">
-        <h1 className="text-lg font-semibold">Admin Dashboard</h1>
-        <p className="text-sm text-gray-600">Pick a date to view & manage bookings.</p>
-      </header>
+    <div className="space-y-6">
+      <h1 className="text-2xl font-semibold text-[color:var(--g600)]">Admin</h1>
+      <div className="grid md:grid-cols-[360px_1fr] gap-4 items-start">
+        <div className="panel max-w-md">
+          <h3 className="font-medium text-[color:var(--g600)] mb-2">Choose a date</h3>
+          <DayPicker mode="single" selected={selectedDate} onSelect={(d)=>d&&setSelectedDate(d)} className="w-full" />
+        </div>
 
-      <div className="grid lg:grid-cols-[360px,1fr] gap-6">
-        <section className="card">
-          <h3 className="font-medium mb-3">Choose a date</h3>
-          <div className="rounded-xl border bg-white overflow-hidden">
-            <DayPicker mode="single" selected={selectedDate} onSelect={(d)=>d && setSelectedDate(d)} showOutsideDays className="p-2" />
+        <div className="panel">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-medium text-[color:var(--g600)]">Bookings • {format(selectedDate, "EEE, MMM d")}</h3>
+            {isLoading && <span className="text-sm opacity-60">Loading…</span>}
           </div>
-        </section>
-
-        <section className="card">
-          <h3 className="font-medium mb-3">Bookings for {format(selectedDate, "MMMM do, yyyy")}</h3>
           <div className="space-y-3">
-            {(data || []).map((b) => (
-              <div key={b.id} className="border rounded-2xl p-4 flex items-start justify-between">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <div className="font-semibold">{b.bay.name}</div>
-                    {b.status === "CONFIRMED" ? (
-                      <span className="badge-green">Confirmed</span>
-                    ) : (
-                      <span className="badge-gray">Canceled</span>
-                    )}
+            {bookings.map(b => (
+              <div key={b.id} className="card hover:shadow-xl">
+                <div className="flex items-start justify-between">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-3">
+                      <span className={`h-2.5 w-2.5 rounded-full ${b.status==="CONFIRMED"?"bg-[color:var(--g600)]":"bg-red-500"}`} />
+                      <div className="font-medium">{b.bay.name} • {b.service.name}</div>
+                      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium shadow ${b.status==="CONFIRMED"?"bg-[color:var(--g50)] text-[color:var(--g600)]":"bg-gray-100 text-gray-700"}`}>{b.status.toLowerCase()}</span>
+                    </div>
+                    <div className="text-sm opacity-80">
+                      {format(new Date(b.startTime), "p")} – {format(new Date(b.endTime), "p")}
+                    </div>
+                    <div className="text-sm opacity-80">{b.customer.fullName} • {b.customer.email}</div>
+                    <div className="text-xs opacity-60">Code: {b.confirmationCode}</div>
                   </div>
-                  <div className="text-sm text-gray-700">{b.service.name} • {fmt(b.startTime)} – {fmt(b.endTime)}</div>
-                  <div className="text-xs text-gray-600">{b.customer.fullName} • {b.customer.email} • Code: {b.confirmationCode}</div>
-                </div>
-                <div>
+
                   {b.status === "CONFIRMED" ? (
-                    <button className="btn-danger" onClick={() => cancelMut.mutate(b.id)} disabled={cancelMut.isPending}>Cancel</button>
+                    <button className="btn" onClick={() => cancel(b.id)}>Cancel</button>
                   ) : (
-                    <span className="text-xs text-gray-500">No actions</span>
+                    <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium shadow bg-gray-100 text-gray-700">No actions</span>
                   )}
                 </div>
               </div>
             ))}
-            {(!data || data.length === 0) && <p className="text-sm text-gray-600">No bookings.</p>}
+            {bookings.length === 0 && <p className="text-sm opacity-80">No bookings.</p>}
           </div>
-        </section>
+        </div>
       </div>
     </div>
   );
-}
-
-function fmt(iso: string) {
-  return format(new Date(iso), "h:mm a");
 }

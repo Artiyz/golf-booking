@@ -10,7 +10,7 @@ export async function POST(_req: NextRequest, ctx: { params: Promise<{ id: strin
       select: { id: true, status: true },
     });
     return NextResponse.json({ ok: true, booking });
-  } catch (e: any) {
-    return NextResponse.json({ ok: false, error: String(e?.message || e) }, { status: 400 });
+  } catch (_e: unknown) {
+    return NextResponse.json({ ok: false }, { status: 400 });
   }
 }

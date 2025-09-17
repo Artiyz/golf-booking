@@ -1,5 +1,6 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 const prisma = new PrismaClient();
+
 async function main() {
   await prisma.service.createMany({
     data: [
@@ -10,7 +11,7 @@ async function main() {
     skipDuplicates: true
   });
 
-  const baysData = [
+  const baysData: { name: string; type: Prisma.$Enums.BayType; capacity: number }[] = [
     { name: "Prime A", type: "PRIME", capacity: 10 },
     { name: "Prime B", type: "PRIME", capacity: 10 },
     { name: "Bay 1",   type: "STANDARD", capacity: 4 },
@@ -22,7 +23,7 @@ async function main() {
     await prisma.bay.upsert({
       where: { name: b.name },
       update: {},
-      create: b as any
+      create: { name: b.name, type: b.type, capacity: b.capacity }
     });
   }
   console.log("Seeded services and bays.");

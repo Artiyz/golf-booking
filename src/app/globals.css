@@ -1,17 +1,128 @@
 @import "tailwindcss";
 @reference "tailwindcss";
 
-.input { @apply w-full rounded-xl border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600; }
-.btn { @apply inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-white font-medium hover:bg-blue-700 active:scale-[.99]; }
-.btn-secondary { @apply inline-flex items-center gap-2 rounded-xl bg-gray-200 px-4 py-2 text-gray-900 hover:bg-gray-300; }
-.card { @apply text-left rounded-2xl border bg-white p-4 shadow-sm hover:shadow transition; }
-.chip { @apply rounded-full border px-3 py-1 text-sm bg-white hover:bg-gray-100; }
-.btn-danger { @apply inline-flex items-center gap-2 rounded-xl bg-red-600 px-3 py-2 text-white font-medium hover:bg-red-700 active:scale-[.99]; }
-.badge { @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium border; }
-.badge-green { @apply border-green-200 text-green-700 bg-green-50; }
-.badge-gray { @apply border-gray-200 text-gray-700 bg-gray-50; }
-.badge-red { @apply border-red-200 text-red-700 bg-red-50; }
-.badge{ @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium border; }
-.badge-green{ @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium border border-green-200 text-green-700 bg-green-50; }
-.badge-gray{ @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium border border-gray-200 text-gray-700 bg-gray-50; }
-.badge-red{ @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium border border-red-200 text-red-700 bg-red-50; }
+:root{
+  --g50:#edf7ef; --g100:#e4f2e8; --g300:#7cc58a; --g400:#5bab6b; --g500:#3e9154; --g600:#2f7a45; --ink:#0f2215;
+}
+.bg-site{background:linear-gradient(180deg,var(--g50) 0%,var(--g100) 40%,#e9f5ef 100%)}
+
+.input{ @apply w-full rounded-xl bg-white/95 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--g500)]; }
+.btn{ @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-white font-semibold shadow; background:var(--g600); transition:filter .15s ease, box-shadow .15s ease; }
+.btn:hover{ filter:brightness(1.05); box-shadow:0 12px 28px rgba(0,0,0,.12); }
+.btn-secondary{ @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 font-medium text-[color:var(--ink)] shadow; background:#ffffffea; }
+
+.card{ @apply rounded-2xl bg-white/95 p-5 shadow-md transition-shadow; }
+.card.selectable{ @apply cursor-pointer; transition:box-shadow .15s ease; }
+.card.selectable:hover{ box-shadow:0 16px 36px rgba(0,0,0,.12); }
+.card.selectable.is-selected{ box-shadow:0 0 0 3px rgba(47,122,69,.55),0 16px 36px rgba(0,0,0,.12); }
+
+.panel{ @apply rounded-2xl bg-white/95 p-6 shadow-lg ; }
+
+.steps-shell{ @apply mx-auto max-w-3xl rounded-2xl shadow-xl overflow-hidden; background:#ffffffcc; }
+.steps-grid{ display:grid; grid-template-columns:repeat(4,1fr); }
+.step{ display:flex; align-items:center; justify-content:center; gap:.5rem; height:3.25rem; font-weight:700; color:#fff; }
+.step-active{ background:var(--g600); }
+.step-done{ background:var(--g500); }
+.step-idle{ background:var(--g400); opacity:.95; }
+
+.form-body{ @apply p-6 bg-white/95; }
+
+.chip{ border-radius:999px; padding:.9rem 1.25rem; font-size:1rem; background:#fff; box-shadow:0 10px 24px rgba(0,0,0,.08); transition:box-shadow .12s ease; }
+.chip:hover{ box-shadow:0 14px 28px rgba(0,0,0,.10); }
+.chip-active{ box-shadow:0 0 0 3px rgba(47,122,69,.55),0 16px 36px rgba(0,0,0,.12); }
+.chip-disabled{ opacity:.5; cursor:not-allowed; box-shadow:0 0 0 0 transparent; }
+
+.rdp{ --rdp-accent-color: var(--g600); width:100%; }
+.step{transition:background-color .15s ease}
+.steps-grid{gap:0}
+.step:not(:first-child){box-shadow:inset 1px 0 0 rgba(255,255,255,.28)}
+.form-body{background:#f6f7f9}
+.panel{background:#f6f7f9}
+.card.selectable:hover{box-shadow:0 12px 28px rgba(0,0,0,.10)}
+.step{transition:background-color .15s ease}
+.steps-grid{gap:0}
+.step:not(:first-child){box-shadow:inset 1px 0 0 rgba(255,255,255,.28)}
+.form-body{background:#f6f7f9}
+.panel{background:#f6f7f9}
+.card.selectable:hover{box-shadow:0 12px 28px rgba(0,0,0,.10)}
+.step{transition:background-color .15s ease}
+.steps-grid{gap:0}
+.step:not(:first-child){box-shadow:inset 1px 0 0 rgba(255,255,255,.28)}
+.form-body{background:#f6f7f9}
+.panel{background:#f6f7f9}
+.card.selectable:hover{box-shadow:0 12px 28px rgba(0,0,0,.10)}
+.form-body{background:#fff}
+.panel{background:#fff}
+.card{box-shadow:0 -2px 8px rgba(0,0,0,.03),0 8px 16px rgba(0,0,0,.08)}
+.card.selectable{transition:transform .15s,box-shadow .15s}
+.card.selectable:hover{transform:translateY(-2px);box-shadow:0 -2px 10px rgba(0,0,0,.04),0 12px 22px rgba(0,0,0,.12)}
+.card.selectable.is-selected,
+.card.selectable.is-selected:hover{box-shadow:0 0 0 3px var(--g-600),0 14px 28px rgba(0,0,0,.14)}
+
+.chip{transition:transform .12s,box-shadow .12s}
+.chip:hover{transform:translateY(-1px);box-shadow:0 -1px 6px rgba(0,0,0,.04),0 10px 18px rgba(0,0,0,.10)}
+.chip-active,
+.chip-active:hover{box-shadow:0 0 0 3px var(--g-600),0 12px 24px rgba(0,0,0,.14)}
+.chip-disabled{opacity:.45;pointer-events:none}
+.card{border:2px solid transparent;box-shadow:0 -2px 8px rgba(0,0,0,.03),0 10px 18px rgba(0,0,0,.10);transition:transform .12s,box-shadow .12s}
+.card.selectable:hover{transform:translateY(-1px);box-shadow:0 -3px 10px rgba(0,0,0,.05),0 14px 24px rgba(0,0,0,.12)}
+.card.selectable.is-selected,
+.card.selectable.is-selected:hover{border-color:var(--g-600);box-shadow:0 -2px 10px rgba(0,0,0,.06),0 16px 28px rgba(0,0,0,.16)}
+
+.chip{border:2px solid transparent;transition:transform .12s,box-shadow .12s}
+.chip:hover{transform:translateY(-1px);box-shadow:0 -1px 6px rgba(0,0,0,.05),0 10px 18px rgba(0,0,0,.12)}
+.chip-active,
+.chip-active:hover{border-color:var(--g-600);box-shadow:0 -1px 8px rgba(0,0,0,.06),0 14px 26px rgba(0,0,0,.16)}
+.chip-disabled{opacity:.45;pointer-events:none}
+.card.selectable:hover{border-color:var(--g-500)}
+.chip:hover{border-color:var(--g-500)}
+.chip-active,
+.chip-active:hover{border-color:var(--g-600)}
+:root{ --select-green:#2e754c }
+
+.card.selectable.is-selected,
+.card.selectable.is-selected:hover{
+  border-color:var(--select-green) !important;
+  box-shadow:0 -2px 10px rgba(0,0,0,.06),
+             0 0 0 2px rgba(46,117,76,.20),
+             0 16px 28px rgba(0,0,0,.16);
+}
+
+.chip-active,
+.chip-active:hover{
+  border-color:var(--select-green) !important;
+  box-shadow:0 -1px 8px rgba(0,0,0,.06),
+             0 0 0 2px rgba(46,117,76,.20),
+             0 14px 26px rgba(0,0,0,.16);
+}
+:root{ --select-green:#2e754c }
+
+.card{ border:2px solid transparent; --tw-ring-offset-shadow:0 0 #0000!important; --tw-ring-shadow:0 0 #0000!important }
+
+.card.selectable:hover{ border-color:transparent }
+
+.card.selectable.is-selected,
+.card.selectable.is-selected:hover{
+  border-color:var(--select-green);
+  box-shadow:0 -2px 10px rgba(0,0,0,.06),0 16px 28px rgba(0,0,0,.16);
+}
+
+.chip{ border:2px solid transparent }
+.chip:hover{ border-color:transparent }
+.chip-active,
+.chip-active:hover{
+  border-color:var(--select-green);
+  box-shadow:0 -1px 8px rgba(0,0,0,.06),0 14px 26px rgba(0,0,0,.16);
+}
+.time-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem}
+@media (min-width:640px){.time-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (min-width:768px){.time-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.chip{display:flex;align-items:center;justify-content:center;width:100%;min-height:44px;padding:.75rem 1rem;border-radius:9999px;background:#fff;border:2px solid transparent;box-shadow:0 -1px 6px rgba(0,0,0,.04),0 10px 18px rgba(0,0,0,.10);transition:transform .08s ease,box-shadow .12s ease}
+.chip:hover{transform:translateY(-1px);box-shadow:0 -1px 8px rgba(0,0,0,.05),0 14px 26px rgba(0,0,0,.14)}
+.chip-active,.chip-active:hover{border-color:var(--g-600);box-shadow:0 -1px 8px rgba(0,0,0,.06),0 14px 26px rgba(0,0,0,.16)}
+.chip-disabled,.chip[disabled]{opacity:.45;pointer-events:none}
+.card{border:2px solid transparent;box-shadow:0 -2px 8px rgba(0,0,0,.04),0 12px 22px rgba(0,0,0,.12);transition:transform .08s ease,box-shadow .12s ease}
+.card.selectable:hover{transform:translateY(-1px);box-shadow:0 -3px 10px rgba(0,0,0,.06),0 16px 28px rgba(0,0,0,.14)}
+.card.selectable.is-selected,.card.selectable.is-selected:hover{border-color:var(--g-600);box-shadow:0 -2px 10px rgba(0,0,0,.06),0 16px 28px rgba(0,0,0,.16)}
+
+.panel:has(.rdp){max-width:360px}

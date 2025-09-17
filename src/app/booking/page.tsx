@@ -1,248 +1,237 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { format, parseISO, startOfToday } from "date-fns";
+import { useEffect, useMemo, useState } from "react";
 import { DayPicker } from "react-day-picker";
-import "react-day-picker/style.css";
-import { useForm } from "react-hook-form";
+import "react-day-picker/dist/style.css";
+import { useForm, type Resolver } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-
-type Service = { id: string; name: string; durationMinutes: number; priceCents: number };
-type Bay = { id: string; name: string; type: string; capacity: number };
-type Slot = { iso: string; available: boolean };
+import { useQuery } from "@tanstack/react-query";
+import { format, parseISO } from "date-fns";
 
 const contactSchema = z.object({
-  fullName: z.string().min(2),
-  email: z.string().email(),
-  phone: z.string().min(6),
+  fullName: z.string().min(1, "Please enter your full name"),
+  email: z.string().email("Enter a valid email"),
+  phone: z.string().min(7, "Enter a valid phone"),
 });
 type ContactData = z.infer<typeof contactSchema>;
 
-function timeLabel(iso: string) {
-  return format(parseISO(iso), "p");
-}
+type Service = { id: string; name: string; durationMinutes: number; priceCents: number };
+type Bay = { id: string; name: string; type: "PRIME" | "STANDARD"; capacity: number };
+type Slot = { iso: string; label: string; available: boolean };
 
 export default function Booking() {
-  const [step, setStep] = useState<1|2|3|4>(1);
+  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
 
-  const form = useForm<ContactData, any, ContactData>({
-    resolver: zodResolver(contactSchema) as any,
+  const contactResolver = zodResolver(contactSchema) as unknown as Resolver<ContactData>;
+  const form = useForm<ContactData>({
+    resolver: contactResolver,
+    defaultValues: { fullName: "", email: "", phone: "" },
+    mode: "onBlur",
   });
 
-  const [services, setServices] = useState<Service[]>([]);
-  const [bays, setBays] = useState<Bay[]>([]);
+  const { data: services = [] } = useQuery({
+    queryKey: ["services"],
+    queryFn: async () => (await fetch("/api/services").then(r=>r.json())) as Service[],
+  });
+
+  const { data: bays = [] } = useQuery({
+    queryKey: ["bays"],
+    queryFn: async () => (await fetch("/api/bays").then(r=>r.json())) as Bay[],
+  });
+
   const [service, setService] = useState<Service | null>(null);
   const [bay, setBay] = useState<Bay | null>(null);
-  const [date, setDate] = useState<Date | undefined>(undefined);
-  const [avail, setAvail] = useState<{ slots: Slot[] } | null>(null);
+
+  const [date, setDate] = useState<Date>(new Date());
+  const dateStr = useMemo(() => format(date, "yyyy-MM-dd"), [date]);
+  const [slots, setSlots] = useState<Slot[]>([]);
   const [slotISO, setSlotISO] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/services").then(r => r.json()).then(setServices);
-    fetch("/api/bays").then(r => r.json()).then(setBays);
-  }, []);
+    if (!service || !bay || !dateStr) return;
+    fetch(`/api/availability?serviceId=${service.id}&bayId=${bay.id}&date=${dateStr}`)
+      .then(r=>r.json())
+      .then(j=> setSlots(Array.isArray(j.slots) ? j.slots as Slot[] : []));
+  }, [service, bay, dateStr]);
 
-  useEffect(() => {
-    if (!service || !bay || !date) return;
-    const d = format(date, "yyyy-MM-dd");
-    fetch(`/api/availability?serviceId=${service.id}&bayId=${bay.id}&date=${d}`)
-      .then(r => r.json())
-      .then(setAvail);
-  }, [service, bay, date]);
-
-  function nextFromContact(values: ContactData) {
-    if (!values) return;
-    setStep(2);
+  function nextFromContact() {
+    if (form.getValues().fullName && form.getValues().email && form.getValues().phone) setStep(2);
   }
 
   async function confirm() {
-    const values = form.getValues();
-    if (!values.fullName || !values.email || !values.phone || !service || !bay || !slotISO) {
-      alert("Missing fields");
-      return;
-    }
+    if (!service || !bay || !slotISO) return;
+    const { fullName, email, phone } = form.getValues();
     const res = await fetch("/api/book", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        fullName: values.fullName,
-        email: values.email,
-        phone: values.phone,
-        serviceId: service.id,
-        bayId: bay.id,
-        slotISO,
-      }),
+      headers: { "Content-Type":"application/json" },
+      body: JSON.stringify({ fullName, email, phone, serviceId: service.id, bayId: bay.id, startISO: slotISO }),
     });
-    const j = await res.json();
-    if (!res.ok) {
-      alert(j.error || "Booking failed");
-      return;
+    if (res.ok) {
+      alert("Booked! A confirmation email was sent.");
+      setStep(1);
+      form.reset();
+      setService(null);
+      setBay(null);
+      setSlots([]);
+      setSlotISO(null);
+      setDate(new Date());
+    } else {
+      const j = await res.json().catch(()=>({error:""}));
+      alert(j.error || "Could not book. Try another time.");
     }
-    alert(`Booked! Code: ${j.code}`);
-    setStep(1);
-    form.reset();
-    setService(null);
-    setBay(null);
-    setDate(undefined);
-    setSlotISO(null);
-    setAvail(null);
   }
 
+  const err = form.formState.errors;
+
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      <Steps step={step} setStep={setStep} />
-
-      {step === 1 && (
-        <section className="bg-white p-6 rounded-2xl shadow space-y-4">
-          <h2 className="text-lg font-semibold">Contact</h2>
-          <form className="space-y-4" onSubmit={form.handleSubmit(nextFromContact)} noValidate>
-            <div>
-              <label className="block text-sm font-medium mb-1">Full name</label>
-              <input className="input" {...form.register("fullName")} placeholder="Jane Doe" />
-            </div>
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Email</label>
-                <input className="input" {...form.register("email")} placeholder="you@example.com" />
+    <div className="mx-auto max-w-3xl">
+      <div className="steps-shell">
+        <div className="steps-grid">
+          {["Contact","Service & Bay","Availability","Confirmation"].map((label, i) => {
+            const n = (i+1) as 1|2|3|4;
+            const cls = n===step ? "step step-active" : n<step ? "step step-done" : "step step-idle";
+            const clickable = n < step;
+            return (
+              <div key={label} className={cls} onClick={()=> clickable && setStep(n)}>
+                <span>{n}.</span><span className="hidden sm:inline">{label}</span>
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Phone</label>
-                <input className="input" {...form.register("phone")} placeholder="555-123-4567" />
-              </div>
-            </div>
-            <div className="pt-2">
-              <button className="btn" type="submit">Continue</button>
-            </div>
-          </form>
-        </section>
-      )}
+            );
+          })}
+        </div>
 
-      {step === 2 && (
-        <section className="grid md:grid-cols-2 gap-6">
-          <div className="bg-white p-6 rounded-2xl shadow">
-            <h3 className="font-medium mb-2">Select a service</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {services.map(s => (
-                <button
-                  key={s.id}
-                  onClick={() => { setService(s); setBay(null); }}
-                  className={`card ${service?.id === s.id ? "ring-2 ring-blue-600" : ""}`}
-                >
-                  <div className="font-semibold">{s.name}</div>
-                  <div className="text-sm">{s.durationMinutes} minutes</div>
-                  <div className="text-sm">${(s.priceCents / 100).toFixed(2)}</div>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-2xl shadow">
-            <h3 className="font-medium mb-2">Pick a bay</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {bays.map(b => (
-                <button
-                  key={b.id}
-                  disabled={!service}
-                  onClick={() => setBay(b)}
-                  className={`card ${bay?.id === b.id ? "ring-2 ring-blue-600" : ""} ${service ? "" : "opacity-50 cursor-not-allowed"}`}
-                  title={service ? "" : "Choose a service first"}
-                >
-                  <div className="font-semibold">{b.name}</div>
-                  <div className="text-sm">{b.type === "PRIME" ? "Prime" : "Standard"}</div>
-                  <div className="text-sm">Capacity {b.capacity}</div>
-                </button>
-              ))}
-            </div>
-            {service && bay && (
-              <div className="mt-4 flex gap-3">
-                <button className="btn" onClick={() => setStep(3)}>View availability</button>
-                <button className="btn-secondary" onClick={() => setBay(null)}>Change service</button>
-              </div>
-            )}
-          </div>
-        </section>
-      )}
-
-      {step === 3 && service && bay && (
-        <section className="space-y-6">
-          <div className="bg-white p-6 rounded-2xl shadow">
-            <div className="mb-2 text-sm text-gray-600">Service: <b>{service.name}</b> • Bay: <b>{bay.name}</b></div>
-            <DayPicker
-              mode="single"
-              selected={date}
-              onSelect={setDate}
-              fromDate={startOfToday()}
-              disabled={{ before: startOfToday() }}
-            />
-          </div>
-
-          {date && (
-            <div className="bg-white p-6 rounded-2xl shadow">
-              <h3 className="font-medium mb-3">Available times</h3>
-              <div className="flex flex-wrap gap-2">
-                {(avail?.slots ?? []).map((s) => (
-                  <button
-                    key={s.iso}
-                    disabled={!s.available}
-                    onClick={() => { setSlotISO(s.iso); setStep(4); }}
-                    className={`chip ${s.available ? "" : "opacity-50 cursor-not-allowed"}`}
-                    title={s.available ? "" : "Unavailable"}
-                  >
-                    {timeLabel(s.iso)}
-                  </button>
-                ))}
-                {Array.isArray(avail?.slots) && avail!.slots.length === 0 && (
-                  <p className="text-sm text-gray-600">No times available.</p>
-                )}
-              </div>
-            </div>
+        <div className="form-body">
+          {step === 1 && (
+            <section className="space-y-4">
+              <h2 className="text-lg font-semibold text-[color:var(--g600)]">Your details</h2>
+              <form className="space-y-4" onSubmit={form.handleSubmit(nextFromContact)} noValidate>
+                <div>
+                  <label className="block text-sm mb-1">Full name</label>
+                  <input
+                    placeholder="Jane Doe"
+                    aria-invalid={!!err.fullName}
+                    className={`input ${err.fullName ? "ring-2 ring-red-500" : ""}`}
+                    {...form.register("fullName")}
+                  />
+                  {err.fullName && <p className="mt-1 text-sm text-red-600">{err.fullName.message as string}</p>}
+                </div>
+                <div>
+                  <label className="block text-sm mb-1">Email</label>
+                  <input
+                    type="email"
+                    placeholder="you@example.com"
+                    aria-invalid={!!err.email}
+                    className={`input ${err.email ? "ring-2 ring-red-500" : ""}`}
+                    {...form.register("email")}
+                  />
+                  {err.email && <p className="mt-1 text-sm text-red-600">{err.email.message as string}</p>}
+                </div>
+                <div>
+                  <label className="block text-sm mb-1">Phone</label>
+                  <input
+                    type="tel"
+                    placeholder="555-123-4567"
+                    aria-invalid={!!err.phone}
+                    className={`input ${err.phone ? "ring-2 ring-red-500" : ""}`}
+                    {...form.register("phone")}
+                  />
+                  {err.phone && <p className="mt-1 text-sm text-red-600">{err.phone.message as string}</p>}
+                </div>
+                <div className="pt-1">
+                  <button className="btn">Continue</button>
+                </div>
+              </form>
+            </section>
           )}
-        </section>
-      )}
 
-      {step === 4 && service && bay && slotISO && (
-        <section className="mt-6 bg-white p-6 rounded-2xl shadow space-y-2">
-          <h3 className="font-medium">Confirm your booking</h3>
-          <ul className="text-sm">
-            <li>Name: {form.getValues().fullName || <i>missing</i>}</li>
-            <li>Email: {form.getValues().email || <i>missing</i>}</li>
-            <li>Phone: {form.getValues().phone || <i>missing</i>}</li>
-            <li>Service: {service.name}</li>
-            <li>Bay: {bay.name}</li>
-            <li>Time: {format(parseISO(slotISO), "eee, MMM d • p")}</li>
-          </ul>
-          <div className="flex gap-3">
-            <button className="btn" onClick={confirm}>Confirm & Send Email</button>
-            <button className="btn-secondary" onClick={() => setStep(3)}>Change time</button>
-          </div>
-        </section>
-      )}
-    </div>
-  );
-}
+          {step === 2 && (
+            <section className="space-y-6">
+              <div className="space-y-3">
+                <h3 className="font-medium text-[color:var(--g600)]">Select a service</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {services.map(s => (
+                    <button key={s.id}
+                      onClick={() => { setService(s); setBay(null); setSlotISO(null); }}
+                      className={`card selectable ${service?.id === s.id ? "is-selected" : ""}`}>
+                      <div className="font-semibold">{s.name}</div>
+                      <div className="text-sm opacity-80">{s.durationMinutes} minutes</div>
+                      <div className="text-sm opacity-80">${(s.priceCents/100).toFixed(2)}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-function Steps({ step, setStep }: { step: 1|2|3|4; setStep: (s: 1|2|3|4) => void }) {
-  const steps = ["Contact", "Service & Bay", "Availability", "Confirmation"];
-  return (
-    <div className="flex items-center gap-2">
-      {steps.map((label, i) => {
-        const n = (i+1) as 1|2|3|4;
-        const active = n === step;
-        const done = n < step;
-        const base = "flex items-center gap-2 px-3 py-2 rounded-t-xl border border-b-0 text-sm";
-        const color = active
-          ? "bg-white text-blue-700 border-blue-300"
-          : done
-          ? "bg-gray-100 text-gray-700 hover:bg-gray-200 cursor-pointer"
-          : "bg-gray-50 text-gray-500";
-        return (
-          <div key={label} className={`${base} ${color}`} onClick={() => { if (done) setStep(n); }}>
-            <span>{n}.</span><span className="hidden sm:inline">{label}</span>
-          </div>
-        );
-      })}
-      <div className="flex-1 border-b" />
+              {service && (
+                <div className="space-y-3">
+                  <h3 className="font-medium text-[color:var(--g600)]">Choose a bay</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {bays.map(b => (
+                      <button key={b.id}
+                        onClick={() => { setBay(b); setSlotISO(null); }}
+                        className={`card selectable ${bay?.id === b.id ? "is-selected" : ""}`}>
+                        <div className="font-semibold">{b.name}</div>
+                        <div className="text-sm opacity-80">{b.type === "PRIME" ? "Prime" : "Standard"} • Cap {b.capacity}</div>
+                      </button>
+                    ))}
+                  </div>
+                  {bay && (
+                    <div className="pt-2">
+                      <button className="btn" onClick={() => setStep(3)}>View availability</button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </section>
+          )}
+
+          {step === 3 && service && bay && (
+            <section className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-6 items-start">
+                <div className="panel">
+                  <h4 className="font-medium text-[color:var(--g600)] mb-2">Pick a date</h4>
+                  <DayPicker mode="single" selected={date} onSelect={(d)=>d&&setDate(d)} className="w-full" />
+                </div>
+
+                <div className="panel">
+                  <h4 className="font-medium text-[color:var(--g600)] mb-2">Available times • {format(date, "EEE, MMM d")}</h4>
+                  <div className="time-grid">
+                    {slots.map(s => (
+                      <button
+                        key={s.iso}
+                        disabled={!s.available}
+                        onClick={() => { if (s.available) { setSlotISO(s.iso); setStep(4); } }}
+                        className={`chip w-full justify-center w-full justify-center ${slotISO===s.iso ? "chip-active" : ""} ${s.available ? "" : "chip-disabled"}`}
+                        title={s.available ? "" : "Unavailable"}
+                      >
+                        {s.label}
+                      </button>
+                    ))}
+                    {slots.length === 0 && <p className="text-sm opacity-75">No times available.</p>}
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
+
+          {step === 4 && service && bay && slotISO && (
+            <section className="panel space-y-3">
+              <h3 className="font-medium text-[color:var(--g600)]">Confirm your booking</h3>
+              <ul className="text-sm">
+                <li>Name: {form.getValues().fullName || <i>missing</i>}</li>
+                <li>Email: {form.getValues().email || <i>missing</i>}</li>
+                <li>Phone: {form.getValues().phone || <i>missing</i>}</li>
+                <li>Service: {service.name}</li>
+                <li>Bay: {bay.name}</li>
+                <li>Time: {format(parseISO(slotISO), "eee, MMM d • p")}</li>
+              </ul>
+              <div className="flex gap-3">
+                <button className="btn" onClick={confirm}>Confirm & Send Email</button>
+                <button className="btn-secondary" onClick={() => setStep(3)}>Change time</button>
+              </div>
+            </section>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

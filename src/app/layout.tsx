@@ -21,7 +21,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <main className="mx-auto max-w-6xl px-4 pt-12 pb-10">
           <ReactQueryClientProvider>{children}</ReactQueryClientProvider>
         </main>
-      </body>
+        
+</body>
     </html>
   );
 }

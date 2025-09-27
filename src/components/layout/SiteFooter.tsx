@@ -1,3 +1,4 @@
+import type { JSX } from 'react'
 import Link from "next/link"
 
 function Icon({ name, href }: { name: "facebook"|"instagram"|"youtube"|"linkedin", href: string }) {

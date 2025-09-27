@@ -9,6 +9,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
 import { format, parseISO } from "date-fns";
 
+// Map a service to an image filename (fallback to slugified name)
+const svcSlug = (x: { name: string; slug?: string }) => (x.slug ?? x.name.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,""));
+
+
 const contactSchema = z.object({
   fullName: z.string().min(1, "Please enter your full name"),
   email: z.string().email("Enter a valid email"),
@@ -153,7 +157,7 @@ export default function Booking() {
                     <button key={s.id}
                       onClick={() => { setService(s); setBay(null); setSlotISO(null); }}
                       className={`card selectable ${service?.id === s.id ? "is-selected" : ""}`}>
-                      <img src={`/services/${(s.slug||"default")}.jpg`} onError={(e)=>{e.currentTarget.src="/services/default.jpg"}} alt={s.name} className="h-36 w-full object-cover rounded-xl mb-3" /><div className="font-semibold">{s.name}</div>
+                      <img src={`/services/${svcSlug(s)}.jpg`} onError={(e)=>{e.currentTarget.src="/services/default.jpg"}} alt={s.name} className="h-36 w-full object-cover rounded-xl mb-3" /><div className="font-semibold">{s.name}</div>
                       <div className="text-sm opacity-80">${(s.priceCents/100).toFixed(2)}</div>
                     </button>
                   ))}
@@ -195,7 +199,7 @@ export default function Booking() {
         <h4 className="font-medium text-[color:var(--g600)] mb-2">Your selection</h4>
         <div className="card selectable is-selected">
           <div className="thumb h-24 rounded-xl overflow-hidden mb-3 bg-gray-100">
-            <img src={"/services/"+service.slug+".jpg"} alt={service.name} className="w-full h-full object-cover" />
+            <img src={`/services/${svcSlug(service)}.jpg`} alt={service.name} className="w-full h-full object-cover" />
           </div>
           <div className="font-medium">{service.name}</div>
           <div className="text-sm opacity-80">{service.durationMinutes} minutes{typeof service.priceCents==="number" ? " • $"+(service.priceCents/100).toFixed(2) : ""}</div>

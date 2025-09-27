@@ -11,7 +11,7 @@ async function main() {
     skipDuplicates: true
   });
 
-  const baysData: { name: string; type: Prisma.$Enums.BayType; capacity: number }[] = [
+  const baysData: { name: string; type: 'PRIME'|'STANDARD'; capacity: number }[] = [
     { name: "Prime A", type: "PRIME", capacity: 10 },
     { name: "Prime B", type: "PRIME", capacity: 10 },
     { name: "Bay 1",   type: "STANDARD", capacity: 4 },

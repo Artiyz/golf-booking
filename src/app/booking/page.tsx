@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import { useForm, type Resolver } from "react-hook-form";
@@ -84,7 +84,7 @@ export default function Booking() {
 
   const err = form.formState.errors;
 
-  return (
+  const pickRef = useRef<HTMLDivElement>(null); const selRef = useRef<HTMLDivElement>(null); const [capH,setCapH]=useState<number|null>(null); useEffect(()=>{ if(pickRef.current){ setCapH(pickRef.current.offsetHeight); } }, [date, service, bay, slots.length]); return (
     <div className="mx-auto max-w-3xl">
       <div className="steps-shell">
         <div className="steps-grid">
@@ -148,13 +148,12 @@ export default function Booking() {
             <section className="space-y-6">
               <div className="space-y-3">
                 <h3 className="font-medium text-[color:var(--g600)]">Select a service</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-start items-start items-start">
                   {services.map(s => (
                     <button key={s.id}
                       onClick={() => { setService(s); setBay(null); setSlotISO(null); }}
                       className={`card selectable ${service?.id === s.id ? "is-selected" : ""}`}>
-                      <div className="font-semibold">{s.name}</div>
-                      <div className="text-sm opacity-80">{s.durationMinutes} minutes</div>
+                      <img src={`/services/${(s.slug||"default")}.jpg`} onError={(e)=>{e.currentTarget.src="/services/default.jpg"}} alt={s.name} className="h-36 w-full object-cover rounded-xl mb-3" /><div className="font-semibold">{s.name}</div>
                       <div className="text-sm opacity-80">${(s.priceCents/100).toFixed(2)}</div>
                     </button>
                   ))}
@@ -164,7 +163,7 @@ export default function Booking() {
               {service && (
                 <div className="space-y-3">
                   <h3 className="font-medium text-[color:var(--g600)]">Choose a bay</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-start items-start items-start">
                     {bays.map(b => (
                       <button key={b.id}
                         onClick={() => { setBay(b); setSlotISO(null); }}
@@ -184,37 +183,58 @@ export default function Booking() {
             </section>
           )}
 
-          {step === 3 && service && bay && (
-            <section className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-6 items-start">
-                <div className="panel">
-                  <h4 className="font-medium text-[color:var(--g600)] mb-2">Pick a date</h4>
-                  <DayPicker mode="single" selected={date} onSelect={(d)=>d&&setDate(d)} className="w-full" />
-                </div>
+          
+{step === 3 && service && bay && (
+  <section className="space-y-6">
+    <div className="grid md:grid-cols-2 gap-6 items-stretch">
+      <div className="panel">
+        <h4 className="font-medium text-[color:var(--g600)] mb-2">Pick a date</h4>
+        <DayPicker mode="single" selected={date} onSelect={(d)=>d&&setDate(d)} className="w-full" />
+      </div>
+      <div className="panel">
+        <h4 className="font-medium text-[color:var(--g600)] mb-2">Your selection</h4>
+        <div className="card selectable is-selected">
+          <div className="thumb h-24 rounded-xl overflow-hidden mb-3 bg-gray-100">
+            <img src={"/services/"+service.slug+".jpg"} alt={service.name} className="w-full h-full object-cover" />
+          </div>
+          <div className="font-medium">{service.name}</div>
+          <div className="text-sm opacity-80">{service.durationMinutes} minutes{typeof service.priceCents==="number" ? " • $"+(service.priceCents/100).toFixed(2) : ""}</div>
+        </div>
+{bay && (
+  <div className="mt-3">
+    <div className="card selectable is-selected">
+      <div className="font-semibold">{bay.name}</div>
+      <div className="text-sm opacity-80">{bay.type === "PRIME" ? "Prime" : "Standard"} • Cap {bay.capacity}</div>
+    </div>
+  </div>
+)}
 
-                <div className="panel">
-                  <h4 className="font-medium text-[color:var(--g600)] mb-2">Available times • {format(date, "EEE, MMM d")}</h4>
-                  <div className="time-grid">
-                    {slots.map(s => (
-                      <button
-                        key={s.iso}
-                        disabled={!s.available}
-                        onClick={() => { if (s.available) { setSlotISO(s.iso); setStep(4); } }}
-                        className={`chip w-full justify-center w-full justify-center ${slotISO===s.iso ? "chip-active" : ""} ${s.available ? "" : "chip-disabled"}`}
-                        title={s.available ? "" : "Unavailable"}
-                      >
-                        {s.label}
-                      </button>
-                    ))}
-                    {slots.length === 0 && <p className="text-sm opacity-75">No times available.</p>}
-                  </div>
-                </div>
-              </div>
-            </section>
-          )}
+      </div>
+    </div>
 
-          {step === 4 && service && bay && slotISO && (
-            <section className="panel space-y-3">
+    <div className="panel">
+      <h4 className="font-medium text-[color:var(--g600)] mb-2">
+        Available times • {format(date, "EEE, MMM d")}
+      </h4>
+      <div className="time-grid">
+        {slots.map(s => (
+          <button
+            key={s.iso}
+            disabled={!s.available}
+            onClick={() => { if (s.available) { setSlotISO(s.iso); setStep(4); } }}
+            className={"chip w-full justify-center " + (slotISO===s.iso ? "chip-active" : "") + (s.available ? "" : " chip-disabled")}
+            title={s.available ? "" : "Unavailable"}
+          >
+            {s.label}
+          </button>
+        ))}
+        {slots.length === 0 && <p className="text-sm opacity-75">No times available.</p>}
+      </div>
+    </div>
+  </section>
+)}
+{step === 4 && service && bay && slotISO && (
+            <section className="panel self-start h-auto space-y-3">
               <h3 className="font-medium text-[color:var(--g600)]">Confirm your booking</h3>
               <ul className="text-sm">
                 <li>Name: {form.getValues().fullName || <i>missing</i>}</li>

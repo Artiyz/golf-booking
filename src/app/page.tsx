@@ -48,8 +48,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-12">
-        <div className="mx-auto w-full max-w-6xl bg-section-a section-card p-8 sm:p-10">
+      <section className="mx-auto max-w-7xl px-4 py-6">
+        <div className="mx-auto w-full max-w-6xl bg-section-a section-card brightness-105 p-8 sm:p-10">
           <div className="flex justify-center">
             <div className="heading-wrap">
               <div className="heading-bar"></div>
@@ -59,7 +59,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="mt-10 grid gap-8 md:grid-cols-2">
+          <div className="mt-5 grid gap-8 md:grid-cols-2">
             <div className="overflow-hidden rounded-2xl shadow">
               <img
                 src={homeImages.about}
@@ -80,7 +80,7 @@ export default function HomePage() {
                 start to finish.
               </p>
               <p className="mt-4 text-[15.5px] leading-8 text-slate-800">
-                We also offer curated food and drink services that can be booked
+                We also offer food and drink services that can be booked
                 alongside your bay, making it easy to pair great play with great
                 company.
               </p>
@@ -90,7 +90,7 @@ export default function HomePage() {
               </p>
               <div className="mt-6">
                 <Link
-                  href="#"
+                  href="/about"
                   className="rounded-md bg-emerald-700 px-5 py-2 text-sm font-medium text-white shadow transition-colors duration-200 hover:bg-emerald-600 hover:shadow-md"
                 >
                   View More
@@ -102,13 +102,13 @@ export default function HomePage() {
       </section>
 
       <section className="full-bleed bg-section-b">
-        <div className="mx-auto max-w-7xl px-4 py-10">
+        <div className="mx-auto max-w-7xl px-4 py-6">
           <div className="text-center">
             <span className="rttu-eyebrow">Ready To Tee Up?</span>
             <h2 className="rttu-title">Plan Your Perfect Round</h2>
           </div>
 
-          <div className="mx-auto mt-10 grid max-w-6xl grid-cols-1 gap-8 md:grid-cols-3">
+          <div className="mx-auto mt-5 grid max-w-6xl grid-cols-1 gap-8 md:grid-cols-3">
             <div className="rttu-card">
               <a href="/booking" className="rttu-card-img">
                 <span className="rttu-card-img-inner">
@@ -178,7 +178,7 @@ export default function HomePage() {
       </section>
 
       <section className="mx-auto max-w-7xl px-4 py-14">
-        <div className="mx-auto w-full max-w-6xl bg-section-c section-card p-8 sm:p-10">
+        <div className="mx-auto w-full max-w-6xl bg-section-c section-card p-6 sm:p-8">
           <div className="flex justify-center">
             <div className="heading-wrap">
               <div className="heading-bar"></div>

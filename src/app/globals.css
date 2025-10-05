@@ -237,3 +237,22 @@ footer.full-bleed{margin-bottom:0;padding-bottom:0}
 .selectionCompact .card{padding:1rem !important}
 .selectionCompact .thumb{height:56px}
 .selectionCompact .card + .card{margin-top:.75rem}
+
+/* === About page themed containers === */
+.about-hero{
+  @apply rounded-3xl ring-1 ring-black/5 shadow-2xl;
+  background: linear-gradient(135deg,#0b766f 0%,#10b981 45%,#86e9f3 120%);
+  color:#ecfdf5;
+}
+.about-hero h1{ color:#ffffff }
+.about-hero .text-slate-900{ color:#ecfdf5 !important }
+
+.about-story{
+  @apply rounded-3xl ring-1 ring-black/5 shadow-xl;
+  background: linear-gradient(135deg,#f5fff9 0%,#eafaf2 100%);
+}
+
+.about-look{
+  @apply rounded-3xl ring-1 ring-black/5 shadow-xl;
+  background: linear-gradient(135deg,#f2f8ff 0%,#eaf6ff 100%);
+}

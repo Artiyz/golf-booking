@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import ExploreCarousel from "@/components/home/ExploreCarousel";
 import { homeImages } from "@/config/homeImages";
+import EventsSection from "@/components/home/EventsSection";
 
 export default function HomePage() {
   const slides = homeImages.slides.map((s, i) => ({
@@ -206,7 +207,9 @@ export default function HomePage() {
             </Link>
           </div>
         </div>
-      </section>
+          </section>
+
+          <EventsSection />
       <SiteFooter />
     </main>
   );

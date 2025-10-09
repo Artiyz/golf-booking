@@ -12,9 +12,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <Link href="/" className="text-lg font-semibold tracking-tight">Celtic Virtual Golf</Link>
             <div className="flex items-center gap-6 text-[15px]">
               <Link href="/">Home</Link>
+              <Link href="/golf-bays">Golf Bays</Link>
+              <Link href="/food">Food & Drink</Link>
+              <Link href="/about">About</Link>
               <Link href="/booking">Booking</Link>
               <Link href="/admin">Admin</Link>
-              <Link href="/about">About</Link>
+              <Link href="/dashboard">Dashboard</Link>
+              
             </div>
           </nav>
         </header>

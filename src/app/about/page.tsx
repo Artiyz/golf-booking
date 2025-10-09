@@ -3,7 +3,7 @@ import Link from "next/link";
 import SiteFooter from "@/components/layout/SiteFooter";
 
 const imgs = {
-  hero: "/golf/images/bay-2.jpg",
+  hero: "/golf/images/about-hero.jpg",
   story: "/golf/images/bay-1.jpg",
   // use real files from /public/golf/images
   lookA: "/golf/images/bay-3.jpg",
@@ -30,12 +30,22 @@ function IconBadge({ className }: { className?: string }) {
 export default function AboutPage() {
   return (
     <main className="min-h-screen text-slate-900">
-      <section className="mx-auto max-w-7xl px-4 pt-2 sm:pt-2 md:pt-3 -mt-2 sm:-mt-3 md:-mt-4 pb-10">
-        <div className={`${cardBase} p-6 md:p-8 bg-[linear-gradient(180deg,#f9fefb_0%,#effcf6_55%,#e2faee_100%)]`}>
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="flex flex-col justify-center">
-              <span className="text-xs uppercase tracking-[0.2em] text-emerald-700/90">About Us</span>
-              <h1 className="mt-2 mb-2 text-3xl sm:text-4xl font-extrabold tracking-tight text-emerald-700">Practice meets play</h1>
+  <section className="full-bleed -mt-12">
+        <div className="relative min-h-[calc(100vh-4rem)]">
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `url(${imgs.hero})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }}
+          />
+          <div className="absolute inset-0 bg-black/35" />
+
+          <div className="relative z-10 mx-auto max-w-7xl flex items-center min-h-[calc(100vh-4rem)] mb-24 px-3 justify-center lg:justify-start lg:pl-8">
+            <div className={`${cardBase} bg-white/90 p-4 sm:p-6 md:p-8 w-full max-w-md sm:max-w-xl lg:max-w-2xl mx-auto lg:mx-0 text-sm lg:text-base shadow-2xl lg:shadow-xl` }>
+              <span className="text-xs uppercase tracking-[0.2em] text-[color:var(--g600)]/90">About Us</span>
+              <h1 className="mt-2 mb-2 text-3xl sm:text-4xl font-extrabold tracking-tight text-[color:var(--g600)]">Practice meets play</h1>
               <p className="mt-2 mb-4 text-[15.5px] leading-7 text-slate-700">
                 A modern simulator studio for grooving your swing, playing world-class
                 courses, or hanging with friends—any time, any weather. We’re open
@@ -43,8 +53,8 @@ export default function AboutPage() {
                 settle in and have fun right away.
               </p>
               <div className="mt-4 mb-3 flex flex-wrap gap-3">
-                <Link href="/booking" className="rounded-md bg-emerald-700 px-4 py-2 text-sm font-medium text-white shadow hover:bg-emerald-600">Book a bay</Link>
-                <Link href="/" className="rounded-md bg-white px-4 py-2 text-sm font-medium text-slate-900 ring-1 ring-black/10 shadow hover:bg-slate-50">Back home</Link>
+                <Link href="/dashboard" className="btn">Book a bay</Link>
+                <Link href="/signup" className="btn-secondary">Become A Member</Link>
               </div>
               <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div className={chip}><div className="text-lg font-semibold">5+</div><div className="opacity-70">Years open</div></div>
@@ -53,14 +63,11 @@ export default function AboutPage() {
                 <div className={chip}><div className="text-lg font-semibold">4.9</div><div className="opacity-70">Avg. rating</div></div>
               </div>
             </div>
-            <div className="rounded-2xl overflow-hidden shadow-lg ring-1 ring-black/5 bg-black/5 mb-2 md:mb-0">
-              <Image src={imgs.hero} alt="Golf bays" width={1400} height={900} className="h-full w-full object-cover" priority />
-            </div>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 pb-10">
+  <section className="mx-auto max-w-7xl px-4 py-6">
         <div className="grid gap-6 md:grid-cols-2">
           <div className={`${cardBase} bg-[linear-gradient(180deg,#f9fefb_0%,#eefcf5_100%)]`}>
             <div className="relative aspect-[16/10] w-full"><Image src={imgs.story} alt="Studio ambiance" fill className="object-cover" /></div>
@@ -86,28 +93,47 @@ export default function AboutPage() {
               <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl ring-1 ring-black/5 shadow"><Image src={imgs.lookC} alt="Bay view 3" fill className="object-cover" /></div>
               <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl ring-1 ring-black/5 shadow"><Image src={imgs.lookD} alt="Bay view 4" fill className="object-cover" /></div>
             </div>
+            <div className="mt-6 flex justify-center">
+              <Link href="/golf-bays" className="btn">
+                View Bays
+              </Link>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 pb-14">
+      <section className="mx-auto max-w-7xl px-4 py-14">
         <div className={`${cardBase} p-6 md:p-8 bg-[linear-gradient(180deg,#f7fff9_0%,#eefcf5_100%)]`}>
           <div className="flex items-center gap-2">
             <IconBadge className="h-5 w-5 text-emerald-700" />
             <h2 className="text-xl font-semibold">Meet the team</h2>
           </div>
-          <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+
+          <p className="mt-3 text-sm text-slate-700">Explore our talented team who keep Celtic Virtual Golf running smoothly — from coaching to guest experience and operations.</p>
+
+          <div className="mt-6 grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {[
-              { name: "Ava", role: "Studio Manager" },
-              { name: "Noah", role: "PGA Coach" },
-              { name: "Mia", role: "Guest Experience" },
+              { name: 'Ava', role: 'Studio Manager' },
+              { name: 'Noah', role: 'PGA Coach' },
+              { name: 'Mia', role: 'Guest Experience' },
+              { name: 'Liam', role: 'Operations' },
+              { name: 'Olivia', role: 'Events' },
+              { name: 'Lucas', role: 'Technical Lead' },
+              { name: 'Zoe', role: 'Hospitality' },
+              { name: 'Ethan', role: 'Front of House' },
             ].map((p) => (
-              <div key={p.name} className="flex items-center gap-3 rounded-2xl bg-white/70 backdrop-blur p-4 ring-1 ring-black/5 shadow">
-                <div className="grid h-10 w-10 place-items-center rounded-full bg-emerald-600 text-white"><IconBadge className="h-5 w-5" /></div>
-                <div><div className="font-medium">{p.name}</div><div className="text-sm opacity-80">{p.role}</div></div>
+              <div key={p.name} className="rttu-card p-4 flex flex-col items-center h-full">
+                <div className="w-full max-w-[160px] h-[240px] overflow-hidden rounded-2xl bg-slate-300">
+                  <img src={`https://placehold.co/300x450/cccccc/ffffff?text=${encodeURIComponent(p.name)}`} alt={p.name} className="w-full h-full object-cover" />
+                </div>
+                <div className="mt-4 text-center">
+                  <div className="font-medium text-slate-900">{p.name}</div>
+                  <div className="text-sm text-slate-700">{p.role}</div>
+                </div>
               </div>
             ))}
           </div>
+
         </div>
       </section>
 

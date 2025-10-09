@@ -1,4 +1,5 @@
 import SiteFooter from "@/components/layout/SiteFooter";
+import FAQ from "@/components/layout/FAQ";
 import Image from "next/image";
 import Link from "next/link";
 import ExploreCarousel from "@/components/home/ExploreCarousel";
@@ -11,9 +12,9 @@ export default function HomePage() {
   }));
 
   return (
-    <main className="min-h-screen bg-transparent text-slate-900">
-      <section className="full-bleed -mt-8 sm:-mt-10 md:-mt-12">
-        <div className="relative h-[420px] sm:h-[520px] md:h-[600px]">
+    <main className="-mt-16 min-h-screen bg-transparent text-slate-900">
+      <section className="full-bleed">
+        <div className="relative h-screen w-screen">
           <div
             className="absolute inset-0"
             style={{
@@ -23,7 +24,7 @@ export default function HomePage() {
             }}
           />
           <div className="absolute inset-0 bg-black/35" />
-          <div className="relative z-10 flex h-full flex-col items-center justify-start pt-10 sm:pt-12 md:pt-14 text-center">
+          <div className="relative z-10 flex h-full flex-col items-center justify-center px-4 text-center">
             <h1 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
               Welcome To
             </h1>
@@ -32,14 +33,14 @@ export default function HomePage() {
             </p>
             <div className="mt-4 flex items-center justify-center gap-3">
               <Link
-                href="/booking"
-                className="rounded-md bg-white px-4 py-2 text-sm font-medium text-slate-900 shadow transition-colors duration-200 hover:bg-slate-100 hover:shadow-md"
+                href="/signup"
+                className="btn-secondary"
               >
                 Become a Member
               </Link>
               <Link
-                href="/booking"
-                className="rounded-md bg-emerald-700 px-4 py-2 text-sm font-medium text-white shadow transition-colors duration-200 hover:bg-emerald-600 hover:shadow-md"
+                href="/dashboard"
+                className="btn"
               >
                 Book a Tee Time
               </Link>
@@ -89,12 +90,7 @@ export default function HomePage() {
                 play, dine, and experience the game in a whole new way.
               </p>
               <div className="mt-6">
-                <Link
-                  href="/about"
-                  className="rounded-md bg-emerald-700 px-5 py-2 text-sm font-medium text-white shadow transition-colors duration-200 hover:bg-emerald-600 hover:shadow-md"
-                >
-                  View More
-                </Link>
+                <Link href="/about" className="btn">View More</Link>
               </div>
             </div>
           </div>
@@ -126,7 +122,7 @@ export default function HomePage() {
                 guests).
               </p>
               <div className="mt-4">
-                <Link href="/booking" className="rttu-btn">
+                <Link href="/dashboard" className="btn">
                   Reserve Bay
                 </Link>
               </div>
@@ -147,7 +143,7 @@ export default function HomePage() {
                 on arrival.
               </p>
               <div className="mt-4">
-                <Link href="#" className="rttu-btn">
+                <Link href="#" className="btn">
                   Pre-Order
                 </Link>
               </div>
@@ -168,7 +164,7 @@ export default function HomePage() {
                 everything we offer.
               </p>
               <div className="mt-4">
-                <Link href="#" className="rttu-btn">
+                <Link href="/signup" className="btn">
                   Sign Up Now
                 </Link>
               </div>
@@ -198,15 +194,11 @@ export default function HomePage() {
             practice, friendly competitions, or casual social play.
           </div>
           <div className="mt-6 flex justify-center">
-            <Link
-              href="#"
-              className="rounded-md bg-emerald-700 px-5 py-2 text-sm font-medium text-white shadow transition-colors duration-200 hover:bg-emerald-600 hover:shadow-md"
-            >
-              View More
-            </Link>
+            <Link href="/golf-bays" className="btn">View More</Link>
           </div>
         </div>
       </section>
+      <FAQ />
       <SiteFooter />
     </main>
   );

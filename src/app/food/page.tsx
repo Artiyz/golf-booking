@@ -2,6 +2,7 @@ import Link from 'next/link'
 import SiteFooter from '@/components/layout/SiteFooter'
 import FAQFood from '@/components/layout/FAQFood'
 
+
 const cardBase = "rounded-3xl shadow-xl ring-1 ring-black/5 overflow-hidden";
 
 export default function FoodPage() {
@@ -210,6 +211,67 @@ Whether you’re enjoying a round with friends or planning ahead for a full day,
           </div>
         </section>
 
+              {/* Section - kidsmenu */}
+
+              {/* Section - Kids Menu */}
+              <div className="flex justify-center my-12 mt-16">
+                  <div className="heading-wrap">
+                      <div className="heading-bar" />
+                      <h2 className="heading-text">Kids Menu</h2>
+                  </div>
+              </div>
+              <section className="mx-auto max-w-7xl px-4 py-6">
+                  <div className={`${cardBase} overflow-hidden bg-[linear-gradient(180deg,#f9fefb_0%,#eefcf5_100%)]`}>
+                      <div className="grid md:grid-cols-[2fr_3fr] gap-0">
+                          <div className="relative h-64 md:h-auto">
+                              <img src="/golf/images/card-food.jpg" alt="Kids Menu" className="absolute inset-0 w-full h-full object-cover" />
+                          </div>
+                          <div className="p-8 md:p-10 flex flex-col justify-center">
+                              <div className="inline-flex items-center gap-2 mb-4">
+                                  <span className="px-3 py-1.5 rounded-full text-xs font-bold text-white uppercase tracking-wider" style={{ background: 'var(--g600)' }}>
+                                      Family Friendly
+                                  </span>
+                              </div>
+                              <h3 className="text-3xl md:text-4xl font-extrabold mb-4" style={{ color: 'var(--g600)' }}>
+                                  Kids Are Welcome!
+                              </h3>
+                              <p className="text-lg text-slate-700 mb-4 leading-relaxed">
+                                  Bringing the family? No problem! We offer a special kids menu designed for young golfers aged 12 and under, featuring favorites like mini burgers, chicken tenders, creamy mac & cheese, and personal pizzas.
+                              </p>
+                              <p className="text-base text-slate-700 mb-6">
+                                  All kids meals include a soft drink or juice box, plus a surprise treat. Our simulators are safe and fun for all ages, with junior clubs available!
+                              </p>
+
+                              {/* Special Offer Card */}
+                              <div className="bg-white rounded-2xl p-5 mb-6 border-2 border-emerald-200 shadow-sm">
+                                  <div className="flex items-start gap-4">
+                                      <div className="flex-shrink-0 w-20 h-20 bg-gradient-to-br from-slate-50 to-emerald-50 rounded-xl flex items-center justify-center p-2">
+                                          <img src="/golf/merch/keychainwithlogo.svg" alt="Free Keychain" className="w-full h-full object-contain" />
+                                      </div>
+                                      <div className="flex-1">
+                                          <div className="flex items-center gap-2 mb-2">
+                                              <span className="px-2 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full">
+                                                  Limited Time
+                                              </span>
+                                          </div>
+                                          <h4 className="text-lg font-bold text-emerald-700 mb-1">
+                                              Free Celtic Keychain Gift!
+                                          </h4>
+                                          <p className="text-sm text-slate-600 leading-relaxed">
+                                              Order any kids meal and receive a complimentary Celtic Golf metal keychain — a special keepsake for our young golfers!
+                                          </p>
+                                      </div>
+                                  </div>
+                              </div>
+
+                              <div className="flex flex-wrap gap-3">
+                                  <Link href="#" className="btn">View Kids Menu</Link>
+                                  <Link href="#" className="btn-secondary">Book Family Bay</Link>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </section>
   {/* Section - FAQ (Food & Drink) */}
         <FAQFood />
 

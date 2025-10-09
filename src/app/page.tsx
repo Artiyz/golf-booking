@@ -4,6 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import ExploreCarousel from "@/components/home/ExploreCarousel";
 import { homeImages } from "@/config/homeImages";
+import EventsSection from "@/components/home/EventsSection";
+import SouvenirSection from "@/components/home/SouvenirSection";
 
 export default function HomePage() {
   const slides = homeImages.slides.map((s, i) => ({
@@ -48,8 +50,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      <section className="mx-auto max-w-7xl px-4 py-6">
+          {/* About Us Section */}
+      <section id="about" className="mx-auto max-w-7xl px-4 py-6">
         <div className="mx-auto w-full max-w-6xl bg-section-a section-card brightness-105 p-8 sm:p-10">
           <div className="flex justify-center">
             <div className="heading-wrap">
@@ -96,8 +98,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      <section className="full-bleed bg-section-b">
+          {/* Ready To Tee Up Section */}
+      <section id="ready-to-tee" className="full-bleed bg-section-b">
         <div className="mx-auto max-w-7xl px-4 py-6">
           <div className="text-center">
             <span className="rttu-eyebrow">Ready To Tee Up?</span>
@@ -172,8 +174,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      <section className="mx-auto max-w-7xl px-4 py-14">
+          {/* Explore Golf Bays Section */}
+      <section id="explore-bays" className="mx-auto max-w-7xl px-4 py-14">
         <div className="mx-auto w-full max-w-6xl bg-section-c section-card p-6 sm:p-8">
           <div className="flex justify-center">
             <div className="heading-wrap">
@@ -197,9 +199,22 @@ export default function HomePage() {
             <Link href="/golf-bays" className="btn">View More</Link>
           </div>
         </div>
-      </section>
-      <FAQ />
-      <SiteFooter />
-    </main>
-  );
+          </section>
+          {/* Events Section */}
+          <div id="events">
+              <EventsSection />
+          </div>
+          {/* Souvenir Section */}
+          <div id="souvenirs">
+              <SouvenirSection />
+          </div>
+          {/* FAQ Section */}
+          <div id="faq">
+              <FAQ />
+          </div>
+
+            <SiteFooter />
+        </main>
+    );
 }
+

@@ -29,8 +29,8 @@ function IconBadge({ className }: { className?: string }) {
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen text-slate-900">
-  <section className="full-bleed -mt-12">
+    <div className="min-h-screen text-slate-900">
+          <section id="hero" className="full-bleed -mt-12">
         <div className="relative min-h-[calc(100vh-4rem)]">
           <div
             className="absolute inset-0"
@@ -67,7 +67,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-  <section className="mx-auto max-w-7xl px-4 py-6">
+          <section id="our-story" className="mx-auto max-w-7xl px-4 py-6">
         <div className="grid gap-6 md:grid-cols-2">
           <div className={`${cardBase} bg-[linear-gradient(180deg,#f9fefb_0%,#eefcf5_100%)]`}>
             <div className="relative aspect-[16/10] w-full"><Image src={imgs.story} alt="Studio ambiance" fill className="object-cover" /></div>
@@ -102,42 +102,245 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-14">
-        <div className={`${cardBase} p-6 md:p-8 bg-[linear-gradient(180deg,#f7fff9_0%,#eefcf5_100%)]`}>
-          <div className="flex items-center gap-2">
-            <IconBadge className="h-5 w-5 text-emerald-700" />
-            <h2 className="text-xl font-semibold">Meet the team</h2>
-          </div>
+          <section id="meet-team"  className="mx-auto max-w-7xl px-4 py-14">
+              <div className={`${cardBase} p-6 md:p-8 bg-[linear-gradient(180deg,#f7fff9_0%,#eefcf5_100%)]`}>
+                  <div className="flex items-center gap-2">
+                      <IconBadge className="h-5 w-5 text-emerald-700" />
+                      <h2 className="text-xl font-semibold">Meet the team</h2>
+                  </div>
 
-          <p className="mt-3 text-sm text-slate-700">Explore our talented team who keep Celtic Virtual Golf running smoothly — from coaching to guest experience and operations.</p>
+                  <p className="mt-3 text-sm text-slate-700">
+                      Explore our talented team who keep Celtic Virtual Golf running smoothly — from coaching to guest experience and operations.
+                  </p>
 
-          <div className="mt-6 grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {[
-              { name: 'Ava', role: 'Studio Manager' },
-              { name: 'Noah', role: 'PGA Coach' },
-              { name: 'Mia', role: 'Guest Experience' },
-              { name: 'Liam', role: 'Operations' },
-              { name: 'Olivia', role: 'Events' },
-              { name: 'Lucas', role: 'Technical Lead' },
-              { name: 'Zoe', role: 'Hospitality' },
-              { name: 'Ethan', role: 'Front of House' },
-            ].map((p) => (
-              <div key={p.name} className="rttu-card p-4 flex flex-col items-center h-full">
-                <div className="w-full max-w-[160px] h-[240px] overflow-hidden rounded-2xl bg-slate-300">
-                  <img src={`https://placehold.co/300x450/cccccc/ffffff?text=${encodeURIComponent(p.name)}`} alt={p.name} className="w-full h-full object-cover" />
-                </div>
-                <div className="mt-4 text-center">
-                  <div className="font-medium text-slate-900">{p.name}</div>
-                  <div className="text-sm text-slate-700">{p.role}</div>
-                </div>
+                  {/* Featured Team Members - Manager & Coach (BIGGER) */}
+                  <div className="mt-6 grid gap-6 grid-cols-1 sm:grid-cols-2">
+                      {/* Ava - Studio Manager */}
+                      <div className="rttu-card p-4 flex flex-col items-center h-full">
+                          <div className="w-full max-w-[220px] h-[330px] overflow-hidden rounded-2xl bg-slate-300">
+                              <img
+                                  src="https://placehold.co/400x600/cccccc/ffffff?text=Ava"
+                                  alt="Ava"
+                                  className="w-full h-full object-cover"
+                              />
+                          </div>
+                          <div className="mt-4 text-center w-full">
+                              <div className="font-bold text-lg text-slate-900">Ava</div>
+                              <div className="text-sm text-emerald-700 font-semibold">Studio Manager</div>
+                              <p className="mt-2 text-sm text-slate-600 leading-relaxed">
+                                  With over 8 years in hospitality management, Ava ensures every guest has an exceptional experience.
+                              </p>
+                          </div>
+                      </div>
+
+                      {/* Noah - PGA Coach */}
+                      <div className="rttu-card p-4 flex flex-col items-center h-full">
+                          <div className="w-full max-w-[220px] h-[330px] overflow-hidden rounded-2xl bg-slate-300">
+                              <img
+                                  src="https://placehold.co/400x600/cccccc/ffffff?text=Noah"
+                                  alt="Noah"
+                                  className="w-full h-full object-cover"
+                              />
+                          </div>
+                          <div className="mt-4 text-center w-full">
+                              <div className="font-bold text-lg text-slate-900">Noah</div>
+                              <div className="text-sm text-emerald-700 font-semibold">PGA Coach</div>
+                              <p className="mt-2 text-sm text-slate-600 leading-relaxed">
+                                  PGA certified with 15+ years teaching experience. Specializes in simulator technology and data-driven coaching.
+                              </p>
+                          </div>
+                      </div>
+                  </div>
+
+                  {/* Rest of Team - Original Size */}
+                  <div className="mt-6 grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+                      {[
+                          { name: 'Mia', role: 'Guest Experience' },
+                          { name: 'Liam', role: 'Operations' },
+                          { name: 'Olivia', role: 'Events' },
+                          { name: 'Lucas', role: 'Technical Lead' },
+                          { name: 'Zoe', role: 'Hospitality' },
+                          { name: 'Ethan', role: 'Front of House' },
+                      ].map((p) => (
+                          <div key={p.name} className="rttu-card p-4 flex flex-col items-center h-full">
+                              <div className="w-full max-w-[160px] h-[240px] overflow-hidden rounded-2xl bg-slate-300">
+                                  <img
+                                      src={`https://placehold.co/300x450/cccccc/ffffff?text=${encodeURIComponent(p.name)}`}
+                                      alt={p.name}
+                                      className="w-full h-full object-cover"
+                                  />
+                              </div>
+                              <div className="mt-4 text-center">
+                                  <div className="font-medium text-slate-900">{p.name}</div>
+                                  <div className="text-sm text-slate-700">{p.role}</div>
+                              </div>
+                          </div>
+                      ))}
+                  </div>
+
               </div>
-            ))}
-          </div>
+          </section>
 
-        </div>
-      </section>
+          {/* Join Us / Careers Section */}
+          <section id="careers"  className="mx-auto max-w-7xl px-4 py-14">
+              <div className={`${cardBase} overflow-hidden bg-white`}>
+                  <div className="grid md:grid-cols-[1fr_2fr] gap-0">
+
+                      {/* Left Column - Why Join Us */}
+                      <div className="p-6 md:p-8 bg-section-a">
+                          <div className="flex items-center gap-2 mb-3">
+                              <svg className="w-5 h-5" style={{ color: 'var(--g600)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                              </svg>
+                              <span className="text-xs uppercase tracking-widest font-bold" style={{ color: 'var(--g600)' }}>Careers</span>
+                          </div>
+
+                          <h2 className="text-2xl md:text-3xl font-extrabold mb-4" style={{ color: 'var(--g600)' }}>
+                              Join Our Team
+                          </h2>
+
+                          <p className="text-sm text-slate-700 leading-relaxed mb-6">
+                              We're building something special at Celtic Virtual Golf—a place where passion for the game meets
+                              cutting-edge technology and genuine hospitality.
+                          </p>
+
+                          {/* Why Join Us Points */}
+                          <div className="space-y-3">
+                              <div className="flex items-start gap-2.5">
+                                  <div className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center mt-0.5" style={{ background: 'rgba(62, 145, 84, 0.15)' }}>
+                                      <svg className="w-4 h-4" style={{ color: 'var(--g600)' }} fill="currentColor" viewBox="0 0 20 20">
+                                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                      </svg>
+                                  </div>
+                                  <div>
+                                      <div className="font-semibold text-sm text-slate-900">Competitive Pay & Benefits</div>
+                                  </div>
+                              </div>
+
+                              <div className="flex items-start gap-2.5">
+                                  <div className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center mt-0.5" style={{ background: 'rgba(62, 145, 84, 0.15)' }}>
+                                      <svg className="w-4 h-4" style={{ color: 'var(--g600)' }} fill="currentColor" viewBox="0 0 20 20">
+                                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                      </svg>
+                                  </div>
+                                  <div>
+                                      <div className="font-semibold text-sm text-slate-900">Flexible Schedule</div>
+                                  </div>
+                              </div>
+
+                              <div className="flex items-start gap-2.5">
+                                  <div className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center mt-0.5" style={{ background: 'rgba(62, 145, 84, 0.15)' }}>
+                                      <svg className="w-4 h-4" style={{ color: 'var(--g600)' }} fill="currentColor" viewBox="0 0 20 20">
+                                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                      </svg>
+                                  </div>
+                                  <div>
+                                      <div className="font-semibold text-sm text-slate-900">Growth Opportunities</div>
+                                  </div>
+                              </div>
+
+                              <div className="flex items-start gap-2.5">
+                                  <div className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center mt-0.5" style={{ background: 'rgba(62, 145, 84, 0.15)' }}>
+                                      <svg className="w-4 h-4" style={{ color: 'var(--g600)' }} fill="currentColor" viewBox="0 0 20 20">
+                                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                      </svg>
+                                  </div>
+                                  <div>
+                                      <div className="font-semibold text-sm text-slate-900">Fun Environment</div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+
+                      {/* Right Column - Open Positions */}
+                      <div className="p-6 md:p-8 bg-white">
+                          <h3 className="text-xl font-bold text-slate-900 mb-5">Open Positions</h3>
+
+                          <div className="space-y-3">
+                              {/* Position 1: Golf Instructor */}
+                              <div className="bg-white border-2 border-slate-200 rounded-xl p-4 hover:border-[color:var(--g500)] transition-colors">
+                                  <div className="flex items-start justify-between mb-2">
+                                      <div>
+                                          <h4 className="font-bold text-base text-slate-900">Golf Instructor / Coach</h4>
+                                          <p className="text-xs font-semibold" style={{ color: 'var(--g600)' }}>Full-time / Part-time</p>
+                                      </div>
+                                      <span className="px-2.5 py-1 rounded-full text-xs font-semibold" style={{ background: 'rgba(62, 145, 84, 0.1)', color: 'var(--g600)' }}>
+                                          New
+                                      </span>
+                                  </div>
+                                  <p className="text-xs text-slate-600 mb-3">
+                                      Teach golfers of all levels using our state-of-the-art simulators. PGA certification preferred but not required.
+                                  </p>
+                                  <Link href="#" className="text-xs font-semibold" style={{ color: 'var(--g600)' }}>
+                                      Learn More →
+                                  </Link>
+                              </div>
+
+                              {/* Position 2: Guest Services */}
+                              <div className="bg-white border-2 border-slate-200 rounded-xl p-4 hover:border-[color:var(--g500)] transition-colors">
+                                  <div className="flex items-start justify-between mb-2">
+                                      <div>
+                                          <h4 className="font-bold text-base text-slate-900">Guest Services Associate</h4>
+                                          <p className="text-xs font-semibold" style={{ color: 'var(--g600)' }}>Full-time</p>
+                                      </div>
+                                  </div>
+                                  <p className="text-xs text-slate-600 mb-3">
+                                      Be the welcoming face of Celtic Virtual Golf. Handle bookings, greet guests, and ensure exceptional experiences.
+                                  </p>
+                                  <Link href="#" className="text-xs font-semibold" style={{ color: 'var(--g600)' }}>
+                                      Learn More →
+                                  </Link>
+                              </div>
+
+                              {/* Position 3: Food & Beverage */}
+                              <div className="bg-white border-2 border-slate-200 rounded-xl p-4 hover:border-[color:var(--g500)] transition-colors">
+                                  <div className="flex items-start justify-between mb-2">
+                                      <div>
+                                          <h4 className="font-bold text-base text-slate-900">Food & Beverage Server</h4>
+                                          <p className="text-xs font-semibold" style={{ color: 'var(--g600)' }}>Part-time</p>
+                                      </div>
+                                  </div>
+                                  <p className="text-xs text-slate-600 mb-3">
+                                      Serve food and drinks to guests in our bays. Previous hospitality experience preferred.
+                                  </p>
+                                  <Link href="#" className="text-xs font-semibold" style={{ color: 'var(--g600)' }}>
+                                      Learn More →
+                                  </Link>
+                              </div>
+
+                              {/* Position 4: Technical Support */}
+                              <div className="bg-white border-2 border-slate-200 rounded-xl p-4 hover:border-[color:var(--g500)] transition-colors">
+                                  <div className="flex items-start justify-between mb-2">
+                                      <div>
+                                          <h4 className="font-bold text-base text-slate-900">Technical Support Specialist</h4>
+                                          <p className="text-xs font-semibold" style={{ color: 'var(--g600)' }}>Part-time</p>
+                                      </div>
+                                  </div>
+                                  <p className="text-xs text-slate-600 mb-3">
+                                      Maintain and troubleshoot our simulator systems. Tech-savvy with basic IT knowledge required.
+                                  </p>
+                                  <Link href="#" className="text-xs font-semibold" style={{ color: 'var(--g600)' }}>
+                                      Learn More →
+                                  </Link>
+                              </div>
+                          </div>
+
+                          {/* General Application CTA */}
+                          <div className="mt-6 p-4 bg-white rounded-xl border-2 border-dashed border-slate-300">
+                              <p className="text-xs text-slate-700 mb-3">
+                                  Don't see the right position? We're always looking for great people!
+                              </p>
+                              <Link href="#" className="btn text-sm">
+                                  Send General Application
+                              </Link>
+                          </div>
+                      </div>
+
+                  </div>
+              </div>
+          </section>
 
       <SiteFooter />
-    </main>
+    </div>
   );
 }

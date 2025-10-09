@@ -41,7 +41,7 @@ export default function EventsSection() {
                                 <span>•</span>
                                 <span>Standard Bays (4 guests max)</span>
                             </div>
-                            <Link href="#" className="rttu-btn">
+                            <Link href="#" className="btn">
                                 Join League
                             </Link>
                         </div>
@@ -71,7 +71,7 @@ export default function EventsSection() {
                                 <span>•</span>
                                 <span>Premium Bays (up to 10 guests)</span>
                             </div>
-                            <Link href="#" className="rttu-btn">
+                            <Link href="#" className="btn">
                                 Book Your Group
                             </Link>
                         </div>
@@ -101,7 +101,7 @@ export default function EventsSection() {
                                 <span>•</span>
                                 <span>All Bays - Special Pricing</span>
                             </div>
-                            <Link href="#" className="rttu-btn">
+                            <Link href="#" className="btn">
                                 See Rates
                             </Link>
                         </div>
@@ -110,7 +110,7 @@ export default function EventsSection() {
 
                 {/* View All Button */}
                 <div className="text-center mt-10">
-                    <Link href="#" className="rttu-btn">
+                    <Link href="#" className="btn">
                         View Full Calendar →
                     </Link>
                 </div>

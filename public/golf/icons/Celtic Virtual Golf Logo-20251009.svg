@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 365.96 354.72">
+  <defs>
+    <style>
+		.cls-1, .cls-2 {
+		fill: #e4b363;
+		}
+
+		.cls-3 {
+		fill: #fff;
+		}
+
+		.cls-4 {
+		font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+		font-size: 95.05px;
+		}
+
+		.cls-4, .cls-5, .cls-2 {
+		isolation: isolate;
+		}
+
+		.cls-4, .cls-5, .cls-6 {
+		fill: #2f7a45;
+		}
+
+		.cls-4, .cls-2 {
+		font-weight: 700;
+		}
+
+		.cls-5 {
+		opacity: .75;
+		}
+
+		.cls-2 {
+		font-family: Poppins-Bold, Poppins;
+		font-size: 60px;
+		}
+
+		.cls-7 {
+		fill: none;
+		stroke: #2f7a45;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+		stroke-width: 5px;
+		}
+	</style>
+  </defs>
+  <g>
+    <text class="cls-4" transform="translate(49.34 266.55)"><tspan x="0" y="0">Celtic</tspan></text>
+    <text class="cls-2" transform="translate(19.59 318.36)"><tspan x="0" y="0">Virtual Golf</tspan></text>
+    <g>
+      <g>
+        <path class="cls-5" d="M217.79,110.66c-13.13,6.4-28.23,7.5-42.14,3.06-.13-.04-.26-.08-.39-.13-2.48-.81-4.91-1.79-7.25-2.94-.12-.06-.25-.12-.37-.18-9.03-4.48-16.73-11.31-22.26-19.74,4.19-2.03,5.51.7,8.68,1.85,23.84,8.59,48.06,8.15,65.76-12.25,16.04-18.48,14.95-39.86,3.77-60.3-1.99-3.64-6.14-6.54-4.69-11-.12-.06-.25-.12-.37-.19.12.06.25.12.37.19,18.92,9.73,30.83,29.25,30.83,50.53s-12.21,41.3-31.56,50.9c-.12.08-.25.14-.38.2h0Z"/>
+        <g>
+          <path class="cls-3" d="M218.53,8.85c.12.06.25.12.37.19-1.46,4.46,2.7,7.36,4.69,11,11.18,20.44,12.27,41.82-3.77,60.3-17.7,20.4-41.92,20.84-65.76,12.25-3.17-1.15-4.49-3.88-8.68-1.85-31.75-48.4,21.5-107.99,73.15-81.89Z"/>
+          <g>
+            <path class="cls-6" d="M181.2,72.24c2.96-.2,5.92,1.36,8.1,3.2-2.08.49-4.06.02-6.22.94-3.67,1.57-6.09,8.05-2.83,11.12-7.5-1.26-8.04-14.67.95-15.26h0Z"/>
+            <path class="cls-6" d="M161.6,25.88c3.46-.78,7.37.51,9.99,2.83,0,.36-4.76.47-5.84.94-4.06,1.77-5.62,7.77-3.01,11.31-6.33-1.13-7.75-13.58-1.14-15.08Z"/>
+            <path class="cls-6" d="M215.49,28.9c2.5-.24,6.76,1.15,8.1,3.58-4.1-.89-9.53,1.43-10.18,6.03-.34,2.45.83,3.82.57,5.84-6.18-3.32-6.74-14.65,1.51-15.45Z"/>
+            <path class="cls-6" d="M189.48,35.31c3.38-.4,6.28,1.32,8.85,3.2-7.32-.86-13.19,4.63-9.42,11.68-6.94-1.35-7.45-13.94.57-14.88Z"/>
+            <path class="cls-6" d="M199.28,58.67c3.02-.42,6.6.69,8.48,3.2-4.48-.66-9.73,1.86-10.18,6.78-.18,2,1.15,3.44.57,5.09-6.04-3.17-6.67-14,1.13-15.07h0Z"/>
+            <path class="cls-6" d="M183.08,10.81c3.49-.7,7.02.49,9.61,2.83-3.32.37-6.93.33-9.04,3.39-1.96,2.83-1.68,5.91-.19,8.85-6.38-2.03-7.18-13.69-.38-15.07Z"/>
+            <path class="cls-6" d="M161.6,51.13c1.88-.16,5.57.6,6.6,2.45-7.02-.08-11,7.03-6.78,12.81l-.94.57c-6.66-3.2-7.44-15.1,1.12-15.83h0Z"/>
+          </g>
+        </g>
+      </g>
+      <path class="cls-7" d="M249.73,59.58c0-21.28-11.91-40.8-30.83-50.53-.12-.06-.25-.12-.37-.19-51.66-26.11-104.9,33.48-73.16,81.88,5.53,8.44,13.22,15.26,22.26,19.74.12.06.25.12.37.18,2.35,1.15,4.77,2.12,7.25,2.94.13.04.26.09.39.13,13.91,4.43,29.01,3.34,42.14-3.06.12-.06.25-.12.37-.18,19.37-9.61,31.58-29.36,31.58-50.91h0Z"/>
+    </g>
+  </g>
+  <g>
+    <rect class="cls-6" x="116.67" y="96.75" width="14.41" height="14.41"/>
+    <rect class="cls-6" x="91.59" y="110.15" width="17.86" height="17.86"/>
+    <rect class="cls-6" x="95.56" y="71.48" width="15.02" height="15.02"/>
+    <rect class="cls-6" x="64.67" y="123.75" width="17.86" height="17.86"/>
+    <rect class="cls-6" x="38.66" y="102.24" width="17.86" height="17.86"/>
+    <rect class="cls-6" x="42.58" y="147.7" width="17.86" height="17.86"/>
+    <rect class="cls-6" x="66.22" y="86.5" width="17.86" height="17.86"/>
+    <rect class="cls-6" x="25.57" y="173.63" width="12.18" height="12.18"/>
+    <rect class="cls-1" x="32.57" y="193.45" width="10.35" height="10.35"/>
+    <rect class="cls-6" x="103.06" y="146.28" width="10.35" height="10.35"/>
+    <rect class="cls-6" x="78.91" y="160.29" width="10.35" height="10.35"/>
+    <rect class="cls-6" x="51.51" y="178.15" width="10.35" height="10.35"/>
+    <rect class="cls-6" x="12.03" y="155.11" width="10.35" height="10.35"/>
+    <rect class="cls-6" x="22.39" y="131.77" width="10.35" height="10.35"/>
+    <rect class="cls-6" x="4.12" y="180.63" width="10.35" height="10.35"/>
+    <rect class="cls-6" x="145.75" y="119.08" width="13.6" height="13.6"/>
+    <rect class="cls-1" x="9.31" y="222.45" width="10.35" height="10.35" transform="translate(-105.04 33.36) rotate(-27.96)"/>
+    <rect class="cls-6" x="122.14" y="134.03" width="10.35" height="10.35"/>
+    <rect class="cls-1" x="26.11" y="213.52" width="10.35" height="10.35" transform="translate(-126.48 64.05) rotate(-37.43)"/>
+    <rect class="cls-1" x="1.45" y="198.65" width="7.92" height="7.92" transform="translate(-100.58 29.85) rotate(-30)"/>
+    <rect class="cls-1" x="33.79" y="236.49" width="7.92" height="7.92" transform="translate(-115.17 51.09) rotate(-30)"/>
+    <rect class="cls-1" x="17.74" y="199.84" width="7.92" height="7.92" transform="translate(-98.99 38.15) rotate(-30)"/>
+  </g>
+</svg>

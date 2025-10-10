@@ -44,10 +44,10 @@ export default function SiteFooter() {
             <div>
               <h4 className="text-sm font-semibold text-emerald-900">Home</h4>
               <ul className="mt-3 space-y-2 text-emerald-900/80">
-                <li><Link href="/about" className="hover:underline">About Us</Link></li>
                 <li><Link href="/golf-bays" className="hover:underline">Golf Bays</Link></li>
-                <li><Link href="/booking" className="hover:underline">Booking</Link></li>
-                <li><Link href="/food-and-drink" className="hover:underline">Food &amp; Drink</Link></li>
+                <li><Link href="/food" className="hover:underline">Food &amp; Drink</Link></li>
+                <li><Link href="/about" className="hover:underline">About Us</Link></li>
+                <li><Link href="/dashboard" className="hover:underline">Booking Dashboard</Link></li>
               </ul>
             </div>
 
@@ -64,7 +64,7 @@ export default function SiteFooter() {
               <h4 className="text-sm font-semibold text-emerald-900">Sign Up For Offers + Updates</h4>
               <p className="mt-3 text-sm text-emerald-900/80">Become a member today and unlock exclusive welcome perks, first-time bay offers, food and drink savings, and regular updates on what’s new at Celtic Virtual Golf.</p>
               <div className="mt-4">
-                <Link href="/signup" className="rounded-md border border-emerald-700 bg-white px-4 py-2 text-sm font-medium text-emerald-800 shadow hover:bg-emerald-50 transition">Join Us Now →</Link>
+                <Link href="/signup" className="btn">Join Us Now →</Link>
               </div>
             </div>
           </div>

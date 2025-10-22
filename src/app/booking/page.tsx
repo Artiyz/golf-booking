@@ -44,7 +44,7 @@ const svcSlug = (x: { name: string; slug?: string }) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
 
-/* Basic contact schema for guest bookings (we still keep it in case you re-enable) */
+/* Basic contact schema for guest bookings */
 const contactSchema = z.object({
   fullName: z.string().min(1, "Please enter your full name"),
   email: z.string().email("Enter a valid email"),
@@ -401,8 +401,8 @@ export default function Booking() {
                     <Image
                       src="/golf/icons/Celtic Virtual Golf Logo-20251009.svg"
                       alt="Celtic Virtual Golf"
-                      width={420}
-                      height={420}
+                      width={320}
+                      height={320}
                       className="max-w-full h-auto"
                       priority
                     />
@@ -433,7 +433,7 @@ export default function Booking() {
                         />
                       </label>
 
-                      {/* Phone (next to Name) */}
+                      {/* Phone */}
                       <label className="block">
                         <span className="block text-sm mb-1">Phone</span>
                         <input
@@ -443,7 +443,7 @@ export default function Booking() {
                         />
                       </label>
 
-                      {/* Email (full width under both) */}
+                      {/* Email */}
                       <label className="block md:col-span-2">
                         <span className="block text-sm mb-1">Email</span>
                         <input

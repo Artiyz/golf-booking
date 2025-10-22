@@ -200,7 +200,7 @@
   .hero { height: 56vh; }
 }
 @media (min-width: 1024px) {
-  .hero { height: 52vh; }
+  .hero { height: 59vh; }
 }
 .bg-section-a{background-image:radial-gradient(1200px 600px at 50% -10%,rgba(16,94,60,.10),transparent),linear-gradient(180deg,rgba(16,94,60,.04),rgba(16,94,60,.02))}
 

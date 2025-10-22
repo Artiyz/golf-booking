@@ -60,7 +60,7 @@ export default function FoodPage() {
             <a href="/food/menu" className="rttu-card-img">
               <span className="rttu-card-img-inner">
                 <img
-                  src="/golf/images/card-food.jpg"
+                  src="/golf/images/Food/How it works(food and drinks)/Browse-Menu-Options.jpg"
                   alt="Browse Menu Options"
                 />
               </span>
@@ -76,7 +76,7 @@ export default function FoodPage() {
             <a className="rttu-card-img">
               <span className="rttu-card-img-inner">
                 <img
-                  src="/golf/images/card-food.jpg"
+                  src="/golf/images/Food/How it works(food and drinks)/Delivery-Option.jpg"
                   alt="Choose Delivery Option"
                 />
               </span>
@@ -93,7 +93,10 @@ export default function FoodPage() {
           <div className="rttu-card p-8 flex flex-col h-full">
             <a href="#" className="rttu-card-img">
               <span className="rttu-card-img-inner">
-                <img src="/golf/images/card-food-2.jpg" alt="Relax and Enjoy" />
+                <img
+                  src="/golf/images/Food/How it works(food and drinks)/Relax-and-Enjoy.jpg"
+                  alt="Relax and Enjoy"
+                />
               </span>
             </a>
             <h4 className="rttu-card-title mt-4">3 - Relax and Enjoy</h4>
@@ -121,22 +124,22 @@ export default function FoodPage() {
               {
                 title: "Maple Bacon Burger",
                 desc: "Smoked cheddar, maple-bacon jam, hand-cut fries.",
-                img: "/golf/images/card-food.jpg",
+                img: "/golf/images/Food/Maple-Bacon-Burger-with-Smoked-Cheddar.jpg",
               },
               {
                 title: "Herb-Roasted Chicken",
                 desc: "Free-range supreme, herb jus, creamy mash.",
-                img: "/golf/images/card-food.jpg",
+                img: "/golf/images/Food/Herb-Roasted-Chicken.jpg",
               },
               {
                 title: "Wild Mushroom Bowl (V)",
                 desc: "Roasted mushrooms, quinoa, seasonal greens.",
-                img: "/golf/images/card-food.jpg",
+                img: "/golf/images/Food/Wild-Mushroom-&-Quinoa-Veggie-Bowl.jpg",
               },
               {
                 title: "Signature Cocktail Flight",
                 desc: "Seasonal twists, fresh garnishes, bright profiles.",
-                img: "/golf/images/card-food.jpg",
+                img: "/golf/images/Food/Signature-Craft-Cocktail-Selection.jpg",
               },
             ].map((item) => (
               <article
@@ -263,10 +266,10 @@ export default function FoodPage() {
           <div
             className={`${cardBase} overflow-hidden bg-[linear-gradient(180deg,#f9fefb_0%,#eefcf5_100%)]`}
           >
-            <div className="grid md:grid-cols-[2fr_3fr] gap-0">
+            <div className="grid md:grid-cols-[3fr_3fr] gap-0">
               <div className="relative h-64 md:h-auto">
                 <img
-                  src="/golf/images/card-food.jpg"
+                  src="/golf/images/Kids-Having-Fun.jpg"
                   alt="Kids Menu"
                   className="absolute inset-0 w-full h-full object-cover"
                 />

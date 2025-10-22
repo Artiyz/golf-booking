@@ -3,11 +3,11 @@ generator client {
 }
 
 datasource db {
-  provider          = "postgresql"
-  url               = env("DATABASE_URL")
-  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
+/* Enums used in code */
 enum BayType {
   PRIME
   STANDARD
@@ -19,50 +19,81 @@ enum BookingStatus {
   CANCELED
 }
 
+enum UserState {
+  REGULAR
+  PREMIUM
+  NO_SHOW
+  BLACKLISTED
+}
+
+/* Tables */
+
 model Bay {
-  id        String    @id @default(cuid())
-  name      String    @unique
-  type      BayType
-  capacity  Int
-  createdAt DateTime  @default(now())
-  bookings  Booking[]
+  id         String    @id @default(cuid())
+  name       String    @unique
+  type       BayType
+  capacity   Int
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  bookings   Booking[]
 }
 
 model Service {
-  id              String    @id @default(cuid())
-  name            String    @unique
-  slug            String    @unique
-  durationMinutes Int
-  priceCents      Int
-  createdAt       DateTime  @default(now())
-  bookings        Booking[]
+  id               String    @id @default(cuid())
+  name             String    @unique
+  slug             String    @unique
+  durationMinutes  Int
+  priceCents       Int
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  bookings         Booking[]
 }
 
 model Customer {
-  id        String    @id @default(cuid())
-  fullName  String
-  email     String    @unique
-  phone     String?
-  createdAt DateTime  @default(now())
-  bookings  Booking[]
+  id         String    @id @default(cuid())
+  fullName   String
+  email      String    @unique
+  phone      String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  bookings   Booking[]
 }
 
 model Booking {
-  id               String        @id @default(cuid())
+  id               String         @id @default(cuid())
   customerId       String
-  customer         Customer      @relation(fields: [customerId], references: [id])
   bayId            String
-  bay              Bay           @relation(fields: [bayId], references: [id])
   serviceId        String
-  service          Service       @relation(fields: [serviceId], references: [id])
   partySize        Int
-  startTime        DateTime      @db.Timestamptz(6)
-  endTime          DateTime      @db.Timestamptz(6)
-  status           BookingStatus @default(CONFIRMED)
-  confirmationCode String        @unique
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
+  startTime        DateTime
+  endTime          DateTime
+  status           BookingStatus  @default(CONFIRMED)
+  confirmationCode String         @unique
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  cancelReason     String?
+  checkedIn        Boolean        @default(false)
+
+  customer Customer @relation(fields: [customerId], references: [id])
+  bay      Bay      @relation(fields: [bayId], references: [id])
+  service  Service  @relation(fields: [serviceId], references: [id])
 
   @@index([bayId, startTime])
   @@index([startTime, endTime])
+}
+
+model User {
+  id           String     @id @default(cuid())
+  firstName    String?
+  lastName     String?
+  email        String     @unique
+  phone        String?    @unique     // DB already had a unique index on phone
+  role         String                  // "ADMIN" | "USER"
+  state        UserState  @default(REGULAR)
+  passwordHash String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
 }

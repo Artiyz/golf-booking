@@ -16,7 +16,7 @@ export default function HomePage() {
   return (
     <main className="-mt-16 min-h-screen bg-transparent text-slate-900">
       <section className="full-bleed">
-        <div className="relative h-screen w-screen">
+        <div className="relative w-screen h-[70vh] md:h-[70vh]">
           <div
             className="absolute inset-0"
             style={{
@@ -34,23 +34,17 @@ export default function HomePage() {
               Celtic Golf Centre
             </p>
             <div className="mt-4 flex items-center justify-center gap-3">
-              <Link
-                href="/signup"
-                className="btn-secondary"
-              >
-                Become a Member
-              </Link>
-              <Link
-                href="/dashboard"
-                className="btn"
-              >
+              <Link href="/booking" className="btn">
                 Book a Tee Time
+              </Link>
+              <Link href="/signup" className="btn-secondary">
+                Become a Member
               </Link>
             </div>
           </div>
         </div>
       </section>
-          {/* About Us Section */}
+      {/* About Us Section */}
       <section id="about" className="mx-auto max-w-7xl px-4 py-6">
         <div className="mx-auto w-full max-w-6xl bg-section-a section-card brightness-105 p-8 sm:p-10">
           <div className="flex justify-center">
@@ -92,13 +86,15 @@ export default function HomePage() {
                 play, dine, and experience the game in a whole new way.
               </p>
               <div className="mt-6">
-                <Link href="/about" className="btn">View More</Link>
+                <Link href="/about" className="btn">
+                  View More
+                </Link>
               </div>
             </div>
           </div>
         </div>
       </section>
-          {/* Ready To Tee Up Section */}
+      {/* Ready To Tee Up Section */}
       <section id="ready-to-tee" className="full-bleed bg-section-b">
         <div className="mx-auto max-w-7xl px-4 py-6">
           <div className="text-center">
@@ -174,7 +170,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-          {/* Explore Golf Bays Section */}
+      {/* Explore Golf Bays Section */}
       <section id="explore-bays" className="mx-auto max-w-7xl px-4 py-14">
         <div className="mx-auto w-full max-w-6xl bg-section-c section-card p-6 sm:p-8">
           <div className="flex justify-center">
@@ -196,25 +192,26 @@ export default function HomePage() {
             practice, friendly competitions, or casual social play.
           </div>
           <div className="mt-6 flex justify-center">
-            <Link href="/golf-bays" className="btn">View More</Link>
+            <Link href="/golf-bays" className="btn">
+              View More
+            </Link>
           </div>
         </div>
-          </section>
-          {/* Events Section */}
-          <div id="events">
-              <EventsSection />
-          </div>
-          {/* Souvenir Section */}
-          <div id="souvenirs">
-              <SouvenirSection />
-          </div>
-          {/* FAQ Section */}
-          <div id="faq">
-              <FAQ />
-          </div>
+      </section>
+      {/* Events Section */}
+      <div id="events">
+        <EventsSection />
+      </div>
+      {/* Souvenir Section */}
+      <div id="souvenirs">
+        <SouvenirSection />
+      </div>
+      {/* FAQ Section */}
+      <div id="faq">
+        <FAQ />
+      </div>
 
-            <SiteFooter />
-        </main>
-    );
+      <SiteFooter />
+    </main>
+  );
 }
-

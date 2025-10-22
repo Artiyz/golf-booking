@@ -1,5 +1,3 @@
-﻿// src/components/home/EventsSection.tsx
-
 import Link from "next/link";
 
 export default function EventsSection() {

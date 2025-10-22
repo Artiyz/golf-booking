@@ -1,5 +1,13 @@
 "use client";
 
+import { useMe, type Me as BaseMe, signalAuthChanged } from "@/lib/useMe";
+type Me = BaseMe & {
+  fullName?: string | null;
+  name?: string | null;
+  phoneNumber?: string | null;
+  tel?: string | null;
+};
+
 import { useEffect, useMemo, useState } from "react";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
@@ -7,8 +15,27 @@ import { useForm, type Resolver } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
-import { format } from "date-fns";
+import { addDays, format } from "date-fns";
 import { ConfirmationView } from "./components/ConfirmationView";
+import Image from "next/image";
+
+/* ====================== Helpers ====================== */
+function parseUser(u?: Me | null): {
+  first: string;
+  last: string;
+  phone: string;
+} {
+  if (!u) return { first: "", last: "", phone: "" };
+  const fullGuess =
+    u.firstName || u.lastName
+      ? `${u.firstName ?? ""} ${u.lastName ?? ""}`.trim()
+      : u.fullName || u.name || "";
+  const parts = (fullGuess || "").trim().split(/\s+/);
+  const first = parts[0] || "";
+  const last = parts.slice(1).join(" ");
+  const phone = (u as any).phone || u.phoneNumber || u.tel || "";
+  return { first, last, phone };
+}
 
 const svcSlug = (x: { name: string; slug?: string }) =>
   x.slug ??
@@ -17,6 +44,7 @@ const svcSlug = (x: { name: string; slug?: string }) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
 
+/* Basic contact schema for guest bookings (we still keep it in case you re-enable) */
 const contactSchema = z.object({
   fullName: z.string().min(1, "Please enter your full name"),
   email: z.string().email("Enter a valid email"),
@@ -39,9 +67,31 @@ type Bay = {
 };
 type Slot = { iso: string; label: string; available: boolean };
 
+/* Hours of operation (local time). After CLOSE_HOUR, we auto-advance to tomorrow. Adjust if needed. */
+const CLOSE_HOUR = 22;
+
+/* ====================== Component ====================== */
 export default function Booking() {
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
+  const { me, authLoading, isAuthed } = useMe();
 
+  // guest deep-link: /booking?guest=1
+  const [guestMode, setGuestMode] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("guest") === "1" && !isAuthed) {
+      setGuestMode(true);
+      setStep(2);
+    }
+  }, [isAuthed]);
+
+  // inline login form (Step 1)
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [loginError, setLoginError] = useState<string | null>(null);
+
+  // contact form (kept for completeness)
   const contactResolver = zodResolver(
     contactSchema
   ) as unknown as Resolver<ContactData>;
@@ -51,6 +101,17 @@ export default function Booking() {
     mode: "onBlur",
   });
 
+  useEffect(() => {
+    if (isAuthed && me) {
+      const full =
+        `${me.firstName ?? ""} ${me.lastName ?? ""}`.trim() || (me.email ?? "");
+      form.setValue("fullName", full);
+      form.setValue("email", me.email ?? "");
+      form.setValue("phone", (me as any).phone ?? "");
+    }
+  }, [isAuthed, me, form]);
+
+  // data queries
   const { data: services = [] } = useQuery({
     queryKey: ["services"],
     queryFn: async () =>
@@ -63,35 +124,140 @@ export default function Booking() {
       (await fetch("/api/bays").then((r) => r.json())) as Bay[],
   });
 
+  // selection state
   const [service, setService] = useState<Service | null>(null);
-  const [bay, setBay] = useState<Bay | null>(null);
 
-  const [date, setDate] = useState<Date>(new Date());
+  const [date, setDate] = useState<Date>(() => {
+    const now = new Date();
+    return now.getHours() >= CLOSE_HOUR ? addDays(now, 1) : now;
+  });
   const dateStr = useMemo(() => format(date, "yyyy-MM-dd"), [date]);
-  const [slots, setSlots] = useState<Slot[]>([]);
-  const [slotISO, setSlotISO] = useState<string | null>(null);
 
+  // For Step 3
+  const [bay, setBay] = useState<Bay | null>(null);
+  const [baySlotsMap, setBaySlotsMap] = useState<Record<string, Slot[]>>({});
+  const [bayHasAvail, setBayHasAvail] = useState<Record<string, boolean>>({});
+  const [loadingBays, setLoadingBays] = useState(false);
+  const [slotISO, setSlotISO] = useState<string | null>(null);
+  const [guestNotice, setGuestNotice] = useState<string | null>(null);
+
+  // Keep today's selection auto-advancing to tomorrow if after close
   useEffect(() => {
-    if (!service || !bay || !dateStr) return;
-    fetch(
-      `/api/availability?serviceId=${service.id}&bayId=${bay.id}&date=${dateStr}`
-    )
-      .then((r) => r.json())
-      .then((j) => setSlots(Array.isArray(j.slots) ? (j.slots as Slot[]) : []));
-  }, [service, bay, dateStr]);
+    const id = setInterval(() => {
+      const now = new Date();
+      const isToday = format(now, "yyyy-MM-dd") === format(date, "yyyy-MM-dd");
+      if (isToday && now.getHours() >= CLOSE_HOUR) {
+        setDate(addDays(now, 1));
+      }
+    }, 60_000);
+    return () => clearInterval(id);
+  }, [date]);
+
+  // When service/date change in Step 3, pre-validate bays (fetch availability per bay)
+  useEffect(() => {
+    if (!service || bays.length === 0) return;
+    // Only when we're going to Step 3 or already in it
+    if (!(step === 3)) return;
+
+    let aborted = false;
+    const controller = new AbortController();
+    (async () => {
+      try {
+        setLoadingBays(true);
+        const results = await Promise.all(
+          bays.map(async (b) => {
+            const r = await fetch(
+              `/api/availability?serviceId=${service.id}&bayId=${b.id}&date=${dateStr}`,
+              {
+                signal: controller.signal,
+              }
+            );
+            const j = await r.json().catch(() => ({ slots: [] }));
+            const slots: Slot[] = Array.isArray(j.slots) ? j.slots : [];
+            const has = slots.some((s) => s.available);
+            return { bayId: b.id, slots, has };
+          })
+        );
+        if (aborted) return;
+        const map: Record<string, Slot[]> = {};
+        const flags: Record<string, boolean> = {};
+        for (const { bayId, slots, has } of results) {
+          map[bayId] = slots;
+          flags[bayId] = has;
+        }
+        setBaySlotsMap(map);
+        setBayHasAvail(flags);
+
+        // If a previously selected bay is now invalid, clear it and times
+        if (bay && !flags[bay.id]) {
+          setBay(null);
+          setSlotISO(null);
+        }
+      } finally {
+        if (!aborted) setLoadingBays(false);
+      }
+    })();
+
+    return () => {
+      aborted = true;
+      controller.abort();
+    };
+  }, [service, dateStr, bays, step]); // run when step===3 with chosen service+date
+
+  // Load times when a bay is selected in Step 3
+  const currentSlots: Slot[] = bay ? baySlotsMap[bay.id] ?? [] : [];
+
+  async function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+    setLoginError(null);
+    try {
+      const r = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ email: loginEmail, password: loginPassword }),
+      });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        setLoginError(j?.error || "Invalid email or password.");
+        return;
+      }
+      signalAuthChanged();
+      setGuestMode(false);
+      setStep(1);
+    } catch {
+      setLoginError("Network error. Please try again.");
+    }
+  }
 
   function nextFromContact() {
-    if (
-      form.getValues().fullName &&
-      form.getValues().email &&
-      form.getValues().phone
-    )
+    if (isAuthed) {
       setStep(2);
+      return;
+    }
+    const v = form.getValues();
+    if (v.fullName && v.email && v.phone) setStep(2);
   }
 
   async function confirm() {
     if (!service || !bay || !slotISO) return;
-    const { fullName, email, phone } = form.getValues();
+
+    let fullName = "";
+    let email = "";
+    let phone = "";
+    if (isAuthed && me?.email) {
+      const p = parseUser(me);
+      fullName =
+        [p.first, p.last].filter(Boolean).join(" ") || (me.email as string);
+      email = me.email as string;
+      phone = p.phone || "";
+    } else {
+      const v = form.getValues();
+      fullName = v.fullName;
+      email = v.email;
+      phone = v.phone;
+    }
+
     const res = await fetch("/api/book", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -110,9 +276,10 @@ export default function Booking() {
       form.reset();
       setService(null);
       setBay(null);
-      setSlots([]);
       setSlotISO(null);
       setDate(new Date());
+      setBaySlotsMap({});
+      setBayHasAvail({});
     } else {
       const j = await res.json().catch(() => ({ error: "" }));
       alert(j.error || "Could not book. Try another time.");
@@ -120,29 +287,26 @@ export default function Booking() {
   }
 
   const err = form.formState.errors;
-
   const [wFullName, wEmail, wPhone] = form.watch([
     "fullName",
     "email",
     "phone",
   ]);
   const customer = useMemo(() => {
-    const parts = (wFullName || "").trim().split(/\s+/);
-    const firstName = parts[0] || "";
+    const parts = String(wFullName || "")
+      .trim()
+      .split(/\s+/);
+    const firstName = parts[0] || String(wFullName || "");
     const lastName = parts.slice(1).join(" ");
-    return {
-      firstName: firstName || wFullName || "",
-      lastName,
-      email: wEmail || "",
-      phone: wPhone || "",
-    };
+    return { firstName, lastName, email: wEmail || "", phone: wPhone || "" };
   }, [wFullName, wEmail, wPhone]);
 
+  /* ====================== UI ====================== */
   return (
     <div className="mx-auto max-w-3xl">
       <div className="steps-shell">
         <div className="steps-grid">
-          {["Contact", "Service & Bay", "Availability", "Confirmation"].map(
+          {["Contact", "Service", "Availability", "Confirmation"].map(
             (label, i) => {
               const n = (i + 1) as 1 | 2 | 3 | 4;
               const cls =
@@ -169,71 +333,151 @@ export default function Booking() {
         <div className="form-body">
           {step === 1 && (
             <section className="space-y-4">
-              <h2 className="text-lg font-semibold text-[color:var(--g600)]">
-                Your details
-              </h2>
-              <form
-                className="space-y-4"
-                onSubmit={form.handleSubmit(nextFromContact)}
-                noValidate
-              >
-                <div>
-                  <label className="block text-sm mb-1">Full name</label>
-                  <input
-                    placeholder="Jane Doe"
-                    aria-invalid={!!err.fullName}
-                    className={`input ${
-                      err.fullName ? "ring-2 ring-red-500" : ""
-                    }`}
-                    {...form.register("fullName")}
-                  />
-                  {err.fullName && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {err.fullName.message as string}
-                    </p>
-                  )}
+              {authLoading ? (
+                <div className="text-sm opacity-80">Checking your session…</div>
+              ) : !isAuthed ? (
+                // --- NOT LOGGED IN ---
+                <div className="grid grid-cols-1 md:grid-cols-[1.25fr_1fr] gap-6 items-start">
+                  {/* Left: login form */}
+                  <div>
+                    <h2 className="mt-4 text-lg font-semibold text-[color:var(--g600)]">
+                      Please log in or sign up to make a booking
+                    </h2>
+                    <form
+                      className="space-y-3 mt-3"
+                      onSubmit={handleLogin}
+                      noValidate
+                    >
+                      <div>
+                        <label className="block text-sm mb-1 mt-6">Email</label>
+                        <input
+                          className="input"
+                          type="email"
+                          value={loginEmail}
+                          onChange={(e) => setLoginEmail(e.target.value)}
+                          placeholder="you@example.com"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm mb-1 mt-4">
+                          Password
+                        </label>
+                        <input
+                          className="input"
+                          type="password"
+                          value={loginPassword}
+                          onChange={(e) => setLoginPassword(e.target.value)}
+                          placeholder="••••••••"
+                          required
+                        />
+                      </div>
+                      {loginError && (
+                        <p className="text-sm text-red-600">{loginError}</p>
+                      )}
+                      <div className="flex items-center gap-3 pt-6">
+                        <button className="btn" type="submit">
+                          Log in
+                        </button>
+                        <a className="btn btn-ghost" href="/signup">
+                          Sign up
+                        </a>
+                        <button
+                          type="button"
+                          className="btn-secondary"
+                          onClick={() => {
+                            setGuestMode(true);
+                            setStep(2);
+                          }}
+                        >
+                          Browse as a guest
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+
+                  {/* Right: logo image */}
+                  <div className="hidden md:flex justify-center mt-4">
+                    <Image
+                      src="/golf/icons/Celtic Virtual Golf Logo-20251009.svg"
+                      alt="Celtic Virtual Golf"
+                      width={420}
+                      height={420}
+                      className="max-w-full h-auto"
+                      priority
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm mb-1">Email</label>
-                  <input
-                    type="email"
-                    placeholder="you@example.com"
-                    aria-invalid={!!err.email}
-                    className={`input ${
-                      err.email ? "ring-2 ring-red-500" : ""
-                    }`}
-                    {...form.register("email")}
-                  />
-                  {err.email && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {err.email.message as string}
-                    </p>
-                  )}
+              ) : (
+                // --- LOGGED IN ---
+                <div className="grid grid-cols-1 md:grid-cols-[1.25fr_1fr] gap-6 items-start">
+                  {/* Left: compact identity layout */}
+                  <div className="min-h-[300px]">
+                    <h2 className=" mt-4 text-lg font-semibold text-[color:var(--g600)]">
+                      {`Hello ${me?.firstName ?? ""}! `}
+                      <span className="font-normal">
+                        Let’s find you the right spot.
+                      </span>
+                    </h2>
+
+                    <div className="mt-5 grid gap-y-5 gap-x-4 md:grid-cols-2">
+                      {/* Name (First + Last) */}
+                      <label className="block">
+                        <span className="block text-sm mb-1">Name</span>
+                        <input
+                          className="input"
+                          value={`${(me?.firstName ?? "").trim()} ${(
+                            me?.lastName ?? ""
+                          ).trim()}`.trim()}
+                          readOnly
+                        />
+                      </label>
+
+                      {/* Phone (next to Name) */}
+                      <label className="block">
+                        <span className="block text-sm mb-1">Phone</span>
+                        <input
+                          className="input"
+                          value={me?.phone ?? ""}
+                          readOnly
+                        />
+                      </label>
+
+                      {/* Email (full width under both) */}
+                      <label className="block md:col-span-2">
+                        <span className="block text-sm mb-1">Email</span>
+                        <input
+                          className="input"
+                          value={me?.email ?? ""}
+                          readOnly
+                        />
+                      </label>
+
+                      <div className="md:col-span-2 flex items-start pt-2">
+                        <button className="btn" onClick={() => setStep(2)}>
+                          Continue
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right: logo image */}
+                  <div className="hidden md:flex justify-center items-center mt-4 ">
+                    <Image
+                      src="/golf/icons/Celtic Virtual Golf Logo-20251009.svg"
+                      alt="Celtic Virtual Golf"
+                      width={420}
+                      height={420}
+                      className="max-w-full h-auto"
+                      priority
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm mb-1">Phone</label>
-                  <input
-                    type="tel"
-                    placeholder="555-123-4567"
-                    aria-invalid={!!err.phone}
-                    className={`input ${
-                      err.phone ? "ring-2 ring-red-500" : ""
-                    }`}
-                    {...form.register("phone")}
-                  />
-                  {err.phone && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {err.phone.message as string}
-                    </p>
-                  )}
-                </div>
-                <div className="pt-1">
-                  <button className="btn">Continue</button>
-                </div>
-              </form>
+              )}
             </section>
           )}
 
+          {/* ==== STEP 2: Only services + “Check availability” ==== */}
           {step === 2 && (
             <section className="space-y-6">
               <div className="space-y-3">
@@ -246,8 +490,8 @@ export default function Booking() {
                       key={s.id}
                       onClick={() => {
                         setService(s);
-                        setBay(null);
                         setSlotISO(null);
+                        setBay(null);
                       }}
                       className={`card selectable ${
                         service?.id === s.id ? "is-selected" : ""
@@ -256,81 +500,74 @@ export default function Booking() {
                       <img
                         src={`/services/${svcSlug(s)}.jpg`}
                         onError={(e) => {
-                          e.currentTarget.src = "/services/default.jpg";
+                          (e.currentTarget as HTMLImageElement).src =
+                            "/services/default.jpg";
                         }}
                         alt={s.name}
-                        className="h-36 w-full object-cover rounded-xl mb-3"
+                        className="h-44 w-full object-cover rounded-xl mb-3"
                       />
                       <div className="font-semibold">{s.name}</div>
                       <div className="text-sm opacity-80">
-                        ${(s.priceCents / 100).toFixed(2)}
+                        {s.durationMinutes} min
+                        {typeof s.priceCents === "number"
+                          ? ` • $${(s.priceCents / 100).toFixed(2)}`
+                          : ""}
                       </div>
                     </button>
                   ))}
                 </div>
               </div>
 
+              {/* Show the button ONLY after a service is picked */}
               {service && (
-                <div className="space-y-3">
-                  <h3 className="font-medium text-[color:var(--g600)]">
-                    Choose a bay
-                  </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-start">
-                    {bays.map((b) => (
-                      <button
-                        key={b.id}
-                        onClick={() => {
-                          setBay(b);
-                          setSlotISO(null);
-                        }}
-                        className={`card selectable ${
-                          bay?.id === b.id ? "is-selected" : ""
-                        }`}
-                      >
-                        <div className="font-semibold">{b.name}</div>
-                        <div className="text-sm opacity-80">
-                          {b.type === "PRIME" ? "Prime" : "Standard"} • Cap{" "}
-                          {b.capacity}
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                  {bay && (
-                    <div className="pt-2">
-                      <button className="btn" onClick={() => setStep(3)}>
-                        View availability
-                      </button>
-                    </div>
-                  )}
+                <div className="pt-2">
+                  <button className="btn" onClick={() => setStep(3)}>
+                    Check availability
+                  </button>
                 </div>
+              )}
+
+              {!service && (
+                <p className="text-sm opacity-70">
+                  Pick a service to continue.
+                </p>
               )}
             </section>
           )}
 
-          {step === 3 && service && bay && (
+          {/* ==== STEP 3: Date picker + equal-height service card, then bay list (validated), then times ==== */}
+          {step === 3 && service && (
             <section className="space-y-6">
+              {/* Equal-height two-column row */}
               <div className="grid md:grid-cols-2 gap-6 items-stretch">
-                <div>
+                <div className="h-full">
                   <h4 className="font-medium text-[color:var(--g600)] mb-2">
                     Pick a date
                   </h4>
-                  <DayPicker
-                    mode="single"
-                    selected={date}
-                    onSelect={(d) => d && setDate(d)}
-                    className="w-full"
-                  />
+                  <div className="w-full rounded-xl ring-1 ring-emerald-900/10 bg-white p-2">
+                    <DayPicker
+                      mode="single"
+                      selected={date}
+                      onSelect={(d) => d && setDate(d)}
+                      className="w-full"
+                    />
+                  </div>
                 </div>
-                <div>
+
+                <div className="h-full">
                   <h4 className="font-medium text-[color:var(--g600)] mb-2">
-                    Your selection
+                    Your service
                   </h4>
-                  <div className="card selectable is-selected">
-                    <div className="thumb h-24 rounded-xl overflow-hidden mb-3 bg-gray-100">
+                  <div className="card selectable is-selected flex flex-col">
+                    <div className="thumb flex-1 max-h-[217px] rounded-xl overflow-hidden mb-3 bg-gray-100">
                       <img
                         src={`/services/${svcSlug(service)}.jpg`}
                         alt={service.name}
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).src =
+                            "/services/default.jpg";
+                        }}
                       />
                     </div>
                     <div className="font-medium">{service.name}</div>
@@ -341,51 +578,118 @@ export default function Booking() {
                         : ""}
                     </div>
                   </div>
-                  <div className="mt-3">
-                    <div className="card selectable is-selected">
-                      <div className="font-semibold">{bay.name}</div>
-                      <div className="text-sm opacity-80">
-                        {bay.type === "PRIME" ? "Prime" : "Standard"} • Cap{" "}
-                        {bay.capacity}
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
 
-              <div>
-                <h4 className="font-medium text-[color:var(--g600)] mb-2">
-                  Available times • {format(date, "EEE, MMM d")}
+              {/* Bay list (validated) */}
+              <div className="space-y-3">
+                <h4 className="font-medium text-[color:var(--g600)]">
+                  Choose a bay
                 </h4>
-                <div className="time-grid">
-                  {slots.map((s) => (
-                    <button
-                      key={s.iso}
-                      disabled={!s.available}
-                      onClick={() => {
-                        if (s.available) {
-                          setSlotISO(s.iso);
-                          setStep(4);
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-start">
+                  {bays.slice(0, 6).map((b) => {
+                    const disabled = loadingBays
+                      ? true
+                      : bayHasAvail[b.id] === false;
+                    const selected = bay?.id === b.id;
+                    return (
+                      <button
+                        key={b.id}
+                        disabled={disabled}
+                        onClick={() => {
+                          if (!disabled) {
+                            setBay(b);
+                            setSlotISO(null);
+                          }
+                        }}
+                        className={
+                          `card selectable w-full ${
+                            selected ? "is-selected" : ""
+                          } ` +
+                          (disabled
+                            ? "opacity-50 cursor-not-allowed ring-1 ring-slate-200"
+                            : "")
                         }
-                      }}
-                      className={
-                        "chip w-full justify-center " +
-                        (slotISO === s.iso ? "chip-active" : "") +
-                        (s.available ? "" : " chip-disabled")
-                      }
-                      title={s.available ? "" : "Unavailable"}
-                    >
-                      {s.label}
-                    </button>
-                  ))}
-                  {slots.length === 0 && (
-                    <p className="text-sm opacity-75">No times available.</p>
+                        title={
+                          disabled
+                            ? "No available window for this service on this date"
+                            : ""
+                        }
+                      >
+                        <div className="font-semibold">{b.name}</div>
+                        <div className="text-sm opacity-80">
+                          {b.type === "PRIME" ? "Prime" : "Standard"} • Cap{" "}
+                          {b.capacity}
+                        </div>
+                        {!disabled && baySlotsMap[b.id] && (
+                          <div className="mt-1 text-xs opacity-70">
+                            {
+                              baySlotsMap[b.id].filter((s) => s.available)
+                                .length
+                            }{" "}
+                            time
+                            {baySlotsMap[b.id].filter((s) => s.available)
+                              .length === 1
+                              ? ""
+                              : "s"}{" "}
+                            available
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+                {loadingBays && (
+                  <div className="text-sm opacity-70">
+                    Checking bay availability…
+                  </div>
+                )}
+              </div>
+
+              {/* Times for selected bay */}
+              {bay && (
+                <div>
+                  <h4 className="font-medium text-[color:var(--g600)] mb-2">
+                    Available times • {bay.name} • {format(date, "EEE, MMM d")}
+                  </h4>
+                  <div className="time-grid">
+                    {currentSlots.map((s) => (
+                      <button
+                        key={s.iso}
+                        disabled={!s.available}
+                        onClick={() => {
+                          if (!s.available) return;
+                          if (!isAuthed) {
+                            setGuestNotice("Please log in to make a booking.");
+                            return;
+                          }
+                          setSlotISO(s.iso);
+                          setGuestNotice(null);
+                          setStep(4);
+                        }}
+                        className={
+                          "chip w-full justify-center " +
+                          (slotISO === s.iso ? "chip-active" : "") +
+                          (s.available ? "" : " chip-disabled")
+                        }
+                        title={s.available ? "" : "Unavailable"}
+                      >
+                        {s.label}
+                      </button>
+                    ))}
+                    {currentSlots.length === 0 && (
+                      <p className="text-sm opacity-75">No times available.</p>
+                    )}
+                  </div>
+                  {guestNotice && (
+                    <p className="mt-2 text-sm text-red-600">{guestNotice}</p>
                   )}
                 </div>
-              </div>
+              )}
             </section>
           )}
 
+          {/* ==== STEP 4: Confirmation ==== */}
           {step === 4 && service && bay && slotISO && (
             <ConfirmationView
               customer={customer}

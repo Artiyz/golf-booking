@@ -3,9 +3,24 @@
 import { useMemo, useState } from "react";
 import { format, parseISO, addMinutes } from "date-fns";
 
-type Customer = { firstName?: string; lastName?: string; email: string; phone?: string };
-type Service = { id: string; name: string; durationMinutes: number; priceCents: number };
-type Bay = { id: string; name: string; type: "PRIME" | "STANDARD"; capacity?: number };
+type Customer = {
+  firstName?: string;
+  lastName?: string;
+  email: string;
+  phone?: string;
+};
+type Service = {
+  id: string;
+  name: string;
+  durationMinutes: number;
+  priceCents: number;
+};
+type Bay = {
+  id: string;
+  name: string;
+  type: "PRIME" | "STANDARD";
+  capacity?: number;
+};
 
 type Props = {
   customer: Customer;
@@ -29,10 +44,10 @@ function renderEmailHTML(args: {
   bookingId?: string;
 }): string {
   const refLine = args.bookingId
-    ? '<tr><td style="padding:2px 24px 0 24px;font-size:12px;color:#6b7280">Reference: <span style="font-family:ui-monospace,Menlo,Consolas,monospace">'
-        + args.bookingId +
-      '</span></td></tr>'
-    : '';
+    ? '<tr><td style="padding:2px 24px 0 24px;font-size:12px;color:#6b7280">Reference: <span style="font-family:ui-monospace,Menlo,Consolas,monospace">' +
+      args.bookingId +
+      "</span></td></tr>"
+    : "";
   return `<!doctype html>
 <html>
 <head>
@@ -80,21 +95,38 @@ export function ConfirmationView({
   const [sending, setSending] = useState(false);
 
   const start = useMemo(() => parseISO(startISO), [startISO]);
-  const end = useMemo(() => addMinutes(start, service.durationMinutes), [start, service.durationMinutes]);
+  const end = useMemo(
+    () => addMinutes(start, service.durationMinutes),
+    [start, service.durationMinutes]
+  );
 
   const whenText = useMemo(
-    () => `${format(start, "EEE, MMM d")} • ${format(start, "h:mm a")} – ${format(end, "h:mm a")}`,
+    () =>
+      `${format(start, "EEE, MMM d")} • ${format(start, "h:mm a")} – ${format(
+        end,
+        "h:mm a"
+      )}`,
     [start, end]
   );
 
   const durationText = `${service.durationMinutes} min`;
   const priceText = `$${(service.priceCents / 100).toFixed(2)}`;
   const bayType = bay.type === "PRIME" ? "Prime" : "Standard";
-  const bayMeta = [bayType, bay.capacity ? `Cap ${bay.capacity}` : ""].filter(Boolean).join(" • ");
-  const greeting = `Dear ${customer.firstName ? customer.firstName : customer.email},`;
-  const nameOnly = [customer.firstName || "", customer.lastName || ""].join(" ").trim();
+  const bayMeta = [bayType, bay.capacity ? `Cap ${bay.capacity}` : ""]
+    .filter(Boolean)
+    .join(" • ");
+  const greeting = `Dear ${
+    customer.firstName ? customer.firstName : customer.email
+  },`;
+  const nameOnly = [customer.firstName || "", customer.lastName || ""]
+    .join(" ")
+    .trim();
   const customerLine = nameOnly || customer.email;
-  const customerLineFull = [customerLine, customer.email !== customerLine ? customer.email : "", customer.phone || ""]
+  const customerLineFull = [
+    customerLine,
+    customer.email !== customerLine ? customer.email : "",
+    customer.phone || "",
+  ]
     .filter(Boolean)
     .join(" • ");
 
@@ -111,7 +143,17 @@ export function ConfirmationView({
         customerLine: customerLineFull,
         bookingId,
       }),
-    [greeting, service.name, priceText, durationText, bay.name, bayMeta, whenText, customerLineFull, bookingId]
+    [
+      greeting,
+      service.name,
+      priceText,
+      durationText,
+      bay.name,
+      bayMeta,
+      whenText,
+      customerLineFull,
+      bookingId,
+    ]
   );
 
   async function handleConfirm() {
@@ -166,7 +208,10 @@ export function ConfirmationView({
         <button className="btn btn-ghost" onClick={onChangeTime}>
           Change time
         </button>
-        <button className="btn btn-ghost" onClick={() => setShowEmail((v) => !v)}>
+        <button
+          className="btn-secondary btn-ghost"
+          onClick={() => setShowEmail((v) => !v)}
+        >
           {showEmail ? "Hide confirmation email" : "Show confirmation email"}
         </button>
       </div>
@@ -178,10 +223,18 @@ export function ConfirmationView({
             <div className="font-medium">Booking Confirmation</div>
             <div className="text-sm opacity-80">
               To: {customer.email}
-              {bookingId ? <> • Ref: <span className="font-mono">{bookingId}</span></> : null}
+              {bookingId ? (
+                <>
+                  {" "}
+                  • Ref: <span className="font-mono">{bookingId}</span>
+                </>
+              ) : null}
             </div>
           </div>
-          <div className="p-4 bg-white" dangerouslySetInnerHTML={{ __html: emailHtml }} />
+          <div
+            className="p-4 bg-white"
+            dangerouslySetInnerHTML={{ __html: emailHtml }}
+          />
         </div>
       )}
     </div>

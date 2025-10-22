@@ -18,6 +18,7 @@ export default function GolfBaysPage() {
                 backgroundPosition: "center",
               }}
             />
+
             <div className="absolute inset-0 bg-black/35" />
 
             <div className="relative min-h-[62vh] sm:min-h-[66vh] lg:min-h-[70vh]">

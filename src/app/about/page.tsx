@@ -15,6 +15,7 @@ const imgs = {
 };
 
 const cardBase = "rounded-3xl shadow-xl ring-1 ring-black/5 overflow-hidden";
+
 const chip =
   "rounded-xl px-3 py-2 shadow-sm ring-1 ring-emerald-900/10 bg-[linear-gradient(180deg,#fcfffd_0%,#f3fdf7_100%)] text-slate-800 flex flex-col gap-0.5 text-xs";
 

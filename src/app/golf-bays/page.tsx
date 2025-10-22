@@ -8,13 +8,12 @@ export default function GolfBaysPage() {
     <main className="-mt-16 min-h-screen text-slate-900">
       <div className="mx-auto max-w-7xl px-4 py-0">
         <section className="full-bleed">
-          {/* Hero wrapper must be relative so the card can be absolutely positioned inside */}
           <div className="hero relative">
             {/* background image */}
             <div
               className="absolute inset-0"
               style={{
-                backgroundImage: `url('/golf/images/bay-1.jpg')`,
+                backgroundImage: `url('/golf/images/Friends-Competing.jpg')`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
               }}
@@ -22,45 +21,47 @@ export default function GolfBaysPage() {
 
             <div className="absolute inset-0 bg-black/35" />
 
-            <div className="relative h-full">
-              <div
-                className="
-                            absolute right-4 md:right-11
-                            bottom-6 sm:bottom-auto
-                            sm:top-[42%] md:top-[40%] lg:top-[41.5%]
-                            sm:-translate-y-1/2
-                            w-full max-w-xl sm:max-w-2xl px-4 md:px-0
-                          "
-              >
-                <div
-                  className={`${cardBase} bg-white/80 backdrop-blur-sm p-4 sm:p-6 md:p-8 text-sm lg:text-base shadow-2xl lg:shadow-xl`}
-                >
-                  <span className="text-xs uppercase tracking-[0.2em] text-[color:var(--g600)]/90">
-                    Golf Bays
-                  </span>
-                  <h1 className="mt-2 mb-2 text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-[color:var(--g600)]">
-                    Explore Our Bays
-                  </h1>
-                  <p className="mt-2 mb-4 text-[14px] lg:text-[15.5px] leading-6 lg:leading-7 text-slate-700">
-                    Celtic Virtual Golf features 6 well-designed golf bays — 2
-                    premium bays for larger groups and 4 standard bays for
-                    everyday play — offered at fair and affordable rates. Each
-                    bay provides ample space, comfortable seating, and a clear
-                    view, making them perfect for practice, friendly
-                    competitions, or casual social play.
-                  </p>
-                  <p className="mt-2 mb-4 text-[13px] text-slate-600">
-                    Premium bays: up to 10 guests. Standard bays: up to 4
-                    guests.
-                  </p>
+            <div className="relative min-h-[62vh] sm:min-h-[66vh] lg:min-h-[70vh]">
+              <div className="mx-auto max-w-6xl lg:max-w-7xl px-4 sm:px-6 h-full">
+                <div className="h-full flex items-center sm:items-start">
+                  <div
+                    className="
+                                w-full sm:w-auto
+                                sm:mt-[14vh] lg:mt-[22vh]
+                                sm:ml-auto
+                                max-w-md sm:max-w-xl lg:max-w-2xl
+                              "
+                  >
+                    <div
+                      className={`${cardBase} bg-white/80 backdrop-blur-sm p-4 sm:p-6 md:p-8 text-sm lg:text-base shadow-2xl lg:shadow-xl`}
+                    >
+                      <span className="text-xs uppercase tracking-[0.2em] text-[color:var(--g600)]/90">
+                        Golf Bays
+                      </span>
+                      <h1 className="mt-2 mb-2 text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-[color:var(--g600)]">
+                        Explore Our Bays
+                      </h1>
+                      <p className="mt-2 mb-4 text-[14px] lg:text-[15.5px] leading-6 lg:leading-7 text-slate-700">
+                        Celtic Virtual Golf features 6 well-designed golf bays —
+                        2 premium bays for larger groups and 4 standard bays for
+                        everyday play — offered at fair and affordable rates.
+                        Each bay provides ample space, comfortable seating, and
+                        a clear view.
+                      </p>
+                      <p className="mt-2 mb-4 text-[13px] text-slate-600">
+                        Premium bays: up to 10 guests. Standard bays: up to 4
+                        guests.
+                      </p>
 
-                  <div className="mt-6 flex gap-3">
-                    <Link href="/dashboard" className="btn">
-                      Book Now
-                    </Link>
-                    <Link href="/signup" className="btn-secondary">
-                      Become a Member
-                    </Link>
+                      <div className="mt-6 flex gap-3">
+                        <Link href="/dashboard" className="btn">
+                          Book Now
+                        </Link>
+                        <Link href="/signup" className="btn-secondary">
+                          Become a Member
+                        </Link>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -82,7 +83,10 @@ export default function GolfBaysPage() {
             <div className="rttu-card p-6 flex flex-col h-[420px]">
               <a href="#" className="rttu-card-img">
                 <span className="rttu-card-img-inner">
-                  <img src="/golf/images/bay-2.jpg" alt="Premium Bay 1" />
+                  <img
+                    src="/golf/images/Corporate-Team-Building-Event.jpg"
+                    alt="Premium Bay 1"
+                  />
                 </span>
               </a>
               <h4 className="rttu-card-title mt-4">
@@ -106,7 +110,7 @@ export default function GolfBaysPage() {
                 </span>
               </a>
               <h4 className="rttu-card-title mt-4">
-                Premium Bay — The Championship Loft
+                Premium Bay — Championship Loft
               </h4>
               <p className="rttu-card-text mt-2">
                 High-capacity bay with extra space, premium audio and dedicated
@@ -122,7 +126,10 @@ export default function GolfBaysPage() {
             <div className="rttu-card p-6 flex flex-col h-[420px]">
               <a href="#" className="rttu-card-img">
                 <span className="rttu-card-img-inner">
-                  <img src="/golf/images/bay-4.jpg" alt="Standard Bay" />
+                  <img
+                    src="/golf/images/State-of-the-Art-Sensor-Close-Up.jpg"
+                    alt="Standard Bay"
+                  />
                 </span>
               </a>
               <h4 className="rttu-card-title mt-4">
@@ -149,8 +156,8 @@ export default function GolfBaysPage() {
                 Standard Bay — The Practice Bay B
               </h4>
               <p className="rttu-card-text mt-2">
-                Reliable simulator bay for practice, leaderboards and quick
-                play. Price from $60/hr.
+                Reliable simulator bay for practice and quick play. Price from
+                $60/hr.
               </p>
               <ul className="mt-3 text-sm text-slate-600 list-disc list-inside">
                 <li>Capacity: up to 4</li>

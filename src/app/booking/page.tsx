@@ -37,6 +37,20 @@ function parseUser(u?: Me | null): {
   return { first, last, phone };
 }
 
+function prefillFromMe(
+  form: ReturnType<typeof useForm<ContactData>>,
+  me?: Me | null
+) {
+  if (!me) return;
+  const p = parseUser(me);
+  form.setValue(
+    "fullName",
+    [p.first, p.last].filter(Boolean).join(" ") || (me?.email ?? "")
+  );
+  form.setValue("email", me?.email ?? "");
+  form.setValue("phone", p.phone || "");
+}
+
 const svcSlug = (x: { name: string; slug?: string }) =>
   x.slug ??
   x.name
@@ -75,7 +89,6 @@ export default function Booking() {
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const { me, authLoading, isAuthed } = useMe();
 
-  // guest deep-link: /booking?guest=1
   const [guestMode, setGuestMode] = useState(false);
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -86,12 +99,10 @@ export default function Booking() {
     }
   }, [isAuthed]);
 
-  // inline login form (Step 1)
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [loginError, setLoginError] = useState<string | null>(null);
 
-  // contact form (kept for completeness)
   const contactResolver = zodResolver(
     contactSchema
   ) as unknown as Resolver<ContactData>;
@@ -102,16 +113,9 @@ export default function Booking() {
   });
 
   useEffect(() => {
-    if (isAuthed && me) {
-      const full =
-        `${me.firstName ?? ""} ${me.lastName ?? ""}`.trim() || (me.email ?? "");
-      form.setValue("fullName", full);
-      form.setValue("email", me.email ?? "");
-      form.setValue("phone", (me as any).phone ?? "");
-    }
-  }, [isAuthed, me, form]);
+    if (isAuthed && me) prefillFromMe(form, me);
+  }, [isAuthed, me, step]);
 
-  // data queries
   const { data: services = [] } = useQuery({
     queryKey: ["services"],
     queryFn: async () =>
@@ -124,7 +128,6 @@ export default function Booking() {
       (await fetch("/api/bays").then((r) => r.json())) as Bay[],
   });
 
-  // selection state
   const [service, setService] = useState<Service | null>(null);
 
   const [date, setDate] = useState<Date>(() => {
@@ -133,7 +136,6 @@ export default function Booking() {
   });
   const dateStr = useMemo(() => format(date, "yyyy-MM-dd"), [date]);
 
-  // For Step 3
   const [bay, setBay] = useState<Bay | null>(null);
   const [baySlotsMap, setBaySlotsMap] = useState<Record<string, Slot[]>>({});
   const [bayHasAvail, setBayHasAvail] = useState<Record<string, boolean>>({});
@@ -141,7 +143,6 @@ export default function Booking() {
   const [slotISO, setSlotISO] = useState<string | null>(null);
   const [guestNotice, setGuestNotice] = useState<string | null>(null);
 
-  // Keep today's selection auto-advancing to tomorrow if after close
   useEffect(() => {
     const id = setInterval(() => {
       const now = new Date();
@@ -153,10 +154,8 @@ export default function Booking() {
     return () => clearInterval(id);
   }, [date]);
 
-  // When service/date change in Step 3, pre-validate bays (fetch availability per bay)
   useEffect(() => {
     if (!service || bays.length === 0) return;
-    // Only when we're going to Step 3 or already in it
     if (!(step === 3)) return;
 
     let aborted = false;
@@ -188,7 +187,6 @@ export default function Booking() {
         setBaySlotsMap(map);
         setBayHasAvail(flags);
 
-        // If a previously selected bay is now invalid, clear it and times
         if (bay && !flags[bay.id]) {
           setBay(null);
           setSlotISO(null);
@@ -202,9 +200,8 @@ export default function Booking() {
       aborted = true;
       controller.abort();
     };
-  }, [service, dateStr, bays, step]); // run when step===3 with chosen service+date
+  }, [service, dateStr, bays, step]);
 
-  // Load times when a bay is selected in Step 3
   const currentSlots: Slot[] = bay ? baySlotsMap[bay.id] ?? [] : [];
 
   async function handleLogin(e: React.FormEvent) {
@@ -274,6 +271,7 @@ export default function Booking() {
       alert("Booked! A confirmation email was sent.");
       setStep(1);
       form.reset();
+      if (isAuthed && me) prefillFromMe(form, me);
       setService(null);
       setBay(null);
       setSlotISO(null);
@@ -293,13 +291,22 @@ export default function Booking() {
     "phone",
   ]);
   const customer = useMemo(() => {
+    if (isAuthed && me) {
+      const p = parseUser(me);
+      return {
+        firstName: p.first,
+        lastName: p.last,
+        email: me.email || "",
+        phone: p.phone || "",
+      };
+    }
     const parts = String(wFullName || "")
       .trim()
       .split(/\s+/);
     const firstName = parts[0] || String(wFullName || "");
     const lastName = parts.slice(1).join(" ");
     return { firstName, lastName, email: wEmail || "", phone: wPhone || "" };
-  }, [wFullName, wEmail, wPhone]);
+  }, [isAuthed, me, wFullName, wEmail, wPhone]);
 
   /* ====================== UI ====================== */
   return (
@@ -592,6 +599,9 @@ export default function Booking() {
                       ? true
                       : bayHasAvail[b.id] === false;
                     const selected = bay?.id === b.id;
+                    const totalAvail =
+                      baySlotsMap[b.id]?.filter((s) => s.available).length ?? 0;
+
                     return (
                       <button
                         key={b.id}
@@ -621,20 +631,11 @@ export default function Booking() {
                           {b.type === "PRIME" ? "Prime" : "Standard"} • Cap{" "}
                           {b.capacity}
                         </div>
-                        {!disabled && baySlotsMap[b.id] && (
-                          <div className="mt-1 text-xs opacity-70">
-                            {
-                              baySlotsMap[b.id].filter((s) => s.available)
-                                .length
-                            }{" "}
-                            time
-                            {baySlotsMap[b.id].filter((s) => s.available)
-                              .length === 1
-                              ? ""
-                              : "s"}{" "}
-                            available
-                          </div>
-                        )}
+
+                        <div className="mt-1 text-xs opacity-70">
+                          {totalAvail} time{totalAvail === 1 ? "" : "s"}{" "}
+                          available
+                        </div>
                       </button>
                     );
                   })}

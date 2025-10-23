@@ -1,4 +1,24 @@
-<svg width="134" height="121" viewBox="0 0 134 121" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M105.64 79.6902C105.64 71.2735 99.7814 64.7085 83.9637 64.7085C75.2738 64.7085 70.5871 68.6222 53.5489 68.6222C41.2463 68.6222 27.5279 73.1252 27.5279 83.5197C27.5279 91.6418 35.7785 98.3752 66.5838 98.3752C92.6048 98.3752 105.64 90.8843 105.64 79.6902Z" stroke="#204536" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M51.9379 22.625V77.3333M51.9379 26.8333V52.0833L81.2298 39.4583L51.9379 26.8333Z" stroke="#E4B363" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+<?xml version="1.0" encoding="utf-8"?>
+<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 134 121">
+	<!-- Generator: Adobe Illustrator 29.5.1, SVG Export Plug-In . SVG Version: 2.1.0 Build 141)  -->
+	<defs>
+		<style>
+			.st0 {
+			stroke: #e4b363;
+			}
+
+			.st0, .st1 {
+			fill: none;
+			stroke-linecap: round;
+			stroke-linejoin: round;
+			stroke-width: 5px;
+			}
+
+			.st1 {
+			stroke: #fff;
+			}
+		</style>
+	</defs>
+	<path class="st1" d="M105.64,79.69c0-8.42-5.86-14.98-21.68-14.98-8.69,0-13.38,3.91-30.41,3.91-12.3,0-26.02,4.5-26.02,14.9,0,8.12,8.25,14.86,39.06,14.86,26.02,0,39.06-7.49,39.06-18.68Z"/>
+	<path class="st0" d="M51.94,22.62v54.71M51.94,26.83v25.25l29.29-12.62-29.29-12.63Z"/>
 </svg>

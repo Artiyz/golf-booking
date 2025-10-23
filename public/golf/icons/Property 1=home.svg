@@ -1,11 +1,38 @@
-<svg width="125" height="120" viewBox="0 0 125 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g clip-path="url(#clip0_127_619)">
-<path d="M32.9702 51.6665V94.5832C33.0452 95.4276 33.4546 96.2083 34.1091 96.7548C34.7636 97.3013 35.6099 97.5691 36.4632 97.4998H52.7494V68.7498H72.1077V97.4998H88.394C89.2473 97.5691 90.0936 97.3013 90.748 96.7548C91.4025 96.2083 91.8119 95.4276 91.8869 94.5832V51.6665" stroke="#E4B363" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M24.5536 60L62.4286 22.5L100.304 60" stroke="#204536" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-</g>
-<defs>
-<clipPath id="clip0_127_619">
-<rect width="101" height="100" fill="white" transform="translate(11.9286 10)"/>
-</clipPath>
-</defs>
+<?xml version="1.0" encoding="utf-8"?>
+<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 125 120">
+	<!-- Generator: Adobe Illustrator 29.5.1, SVG Export Plug-In . SVG Version: 2.1.0 Build 141)  -->
+	<defs>
+		<style>
+			.st0, .st1, .st2 {
+			fill: none;
+			}
+
+			.st1 {
+			stroke: #e4b363;
+			}
+
+			.st1, .st2 {
+			stroke-linecap: round;
+			stroke-linejoin: round;
+			stroke-width: 5px;
+			}
+
+			.st2 {
+			stroke: #fff;
+			}
+
+			.st3 {
+			clip-path: url(#clippath);
+			}
+		</style>
+		<clipPath id="clippath">
+			<rect class="st0" x="11.93" y="10" width="101" height="100"/>
+		</clipPath>
+	</defs>
+	<g class="st3">
+		<g>
+			<path class="st1" d="M32.97,51.67v42.92c.08.84.48,1.63,1.14,2.17s1.5.81,2.35.75h16.29v-28.75h19.36v28.75h16.29c.85.07,1.7-.2,2.35-.75.65-.55,1.06-1.33,1.14-2.17v-42.92"/>
+			<path class="st2" d="M24.55,60L62.43,22.5l37.88,37.5"/>
+		</g>
+	</g>
 </svg>

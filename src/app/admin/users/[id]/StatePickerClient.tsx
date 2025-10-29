@@ -27,7 +27,6 @@ export default function StatePickerClient({ userId, initialState }: Props) {
     [state]
   );
 
-  // close dropdown on outside click / Esc
   useEffect(() => {
     function onDoc(e: MouseEvent) {
       if (!popRef.current) return;
@@ -58,9 +57,28 @@ export default function StatePickerClient({ userId, initialState }: Props) {
         const j = await r.json().catch(() => ({}));
         throw new Error(j?.error || "Failed to update state");
       }
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(
+          new CustomEvent("statepicker:saved", {
+            detail: {
+              message: `User state updated to ${state
+                .replace("_", " ")
+                .toLowerCase()}.`,
+            },
+          })
+        );
+      }
       router.refresh();
     } catch (e: any) {
-      setErr(e?.message || "Failed to update");
+      const message = e?.message || "Failed to update";
+      setErr(message);
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(
+          new CustomEvent("statepicker:error", {
+            detail: { message },
+          })
+        );
+      }
     } finally {
       setBusy(false);
     }
@@ -82,7 +100,15 @@ export default function StatePickerClient({ userId, initialState }: Props) {
       router.replace("/admin/users");
       router.refresh();
     } catch (e: any) {
-      setErr(e?.message || "Failed to delete");
+      const message = e?.message || "Failed to delete";
+      setErr(message);
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(
+          new CustomEvent("statepicker:error", {
+            detail: { message },
+          })
+        );
+      }
     } finally {
       setBusy(false);
     }
@@ -90,7 +116,6 @@ export default function StatePickerClient({ userId, initialState }: Props) {
 
   return (
     <div className="flex w-full flex-wrap items-center gap-3">
-      {/* Modern dropdown */}
       <div ref={popRef} className="relative">
         <button
           type="button"
@@ -159,7 +184,6 @@ export default function StatePickerClient({ userId, initialState }: Props) {
         )}
       </div>
 
-      {/* push actions to the right */}
       <div className="ml-auto flex items-center gap-2">
         <button
           type="button"

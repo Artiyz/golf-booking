@@ -20,7 +20,7 @@ export default function FoodPage() {
             />
             <div className="absolute inset-0 bg-black/35" />
 
-            <div className="relative z-10 mx-auto max-w-7xl flex items-center justify-center lg:justify-start min-h-[60vh] px-3 lg:pl-8">
+            <div className="relative z-10 mx-auto max-w-7xl flex items-center justify-center lg:justify-start min-h-[60vh] px-3 lg:pl-19">
               <div className="rounded-3xl ring-1 ring-black/5 overflow-hidden bg-white/90 p-4 sm:p-6 md:p-8 w-full max-w-md sm:max-w-xl lg:max-w-2xl mx-auto lg:mx-0 text-sm lg:text-base shadow-2xl lg:shadow-xl">
                 <span className="text-xs uppercase tracking-[0.2em] text-[color:var(--g600)]/90">
                   Food &amp; Drink Services
@@ -29,10 +29,9 @@ export default function FoodPage() {
                   It&apos;s Golf, But Not Just Golf
                 </h1>
                 <p className="mt-2 mb-4 text-[14px] lg:text-[15.5px] leading-6 lg:leading-7 text-slate-700">
-                  At Celtic Virtual Golf, great play deserves great dining.
-                  Whether you’re enjoying a round with friends or planning ahead
-                  for a full day, our food and drink options make every visit
-                  easier and tastier.
+                  At Celtic, great play deserves great dining. Whether you’re
+                  enjoying a round with friends or planning for a full day, our
+                  food and drink options make every visit tastier.
                 </p>
                 <p className="mt-2 mb-4 text-[14px] lg:text-[15.5px] leading-6 lg:leading-7 text-slate-700">
                   You can dine in at our lounge, enjoy bay-side service, or
@@ -185,73 +184,97 @@ export default function FoodPage() {
             <h2 className="heading-text">Our partners &amp; selections</h2>
           </div>
         </div>
+
         <section className="mx-auto max-w-7xl px-4 py-3">
           <div
             className={`${cardBase} p-6 md:p-8 bg-[linear-gradient(180deg,#f9fefb_0%,#eefcf5_100%)]`}
           >
             <div className="mt-6 grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
-              {[
-                {
-                  name: "Fairway Kitchen",
-                  tag: "Daily specials & family promotions",
-                  desc: "Classic comfort dishes and casual dining favourites.",
-                },
-                {
-                  name: "Greenhouse Bites",
-                  tag: "Grab & Go — Ready in 10 mins",
-                  desc: "Fresh salads, wraps, and healthy options.",
-                },
-                {
-                  name: "Slice & Swing Pizza Co.",
-                  tag: "Stone-oven pizza specials & combos",
-                  desc: "Artisan pizzas made fresh to order.",
-                },
-                {
-                  name: "The Celtic Grill",
-                  tag: "Chef’s signature burgers & promos",
-                  desc: "Premium burgers, fries, and shareable plates.",
-                },
-                {
-                  name: "Birdie Bar Co.",
-                  tag: "Happy Hour 4–9pm",
-                  desc: "Handcrafted cocktails and mocktails.",
-                },
-                {
-                  name: "Cool 9 Beverages",
-                  tag: "Seasonal cold drinks & promotions",
-                  desc: "Juices, smoothies, and soft drinks.",
-                },
-                {
-                  name: "The Brew Loft",
-                  tag: "On Tap & Craft Flights",
-                  desc: "Local craft beer and premium coffee selections.",
-                },
-                {
-                  name: "9th Hole Café",
-                  tag: "Breakfast & Brunch 8–11am",
-                  desc: "Breakfast classics, pastries and specialty coffee.",
-                },
-              ].map((p) => (
-                <div
-                  key={p.name}
-                  className="rttu-card p-4 flex flex-col items-center h-full"
-                >
-                  <div className="w-[120px] h-[120px] overflow-hidden rounded-full bg-slate-300">
-                    <img
-                      src={`https://placehold.co/300x300/cccccc/ffffff?text=${encodeURIComponent(
-                        p.name
-                      )}`}
-                      alt={p.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="mt-4 text-center">
-                    <div className="font-medium text-slate-900">{p.name}</div>
-                    <div className="text-xs text-emerald-700 mt-1">{p.tag}</div>
-                    <div className="text-sm text-slate-700 mt-2">{p.desc}</div>
-                  </div>
-                </div>
-              ))}
+              {(() => {
+                const imgByName: Record<string, string> = {
+                  "Fairway Kitchen": "Fairway-Kitchen.jpg",
+                  "Greenhouse Bites": "Greenhouse-Bites.jpg",
+                  "Slice & Swing Pizza Co.": "Slice-&-Swing-Pizza-Co.jpg",
+                  "The Celtic Grill": "The-Celtic-Grill.jpg",
+                  "Birdie Bar Co.": "Birdie-Bar-Co.jpg",
+                  "Cool 9 Beverages": "Cool-9-Beverages.jpg",
+                  "The Brew Loft": "The-Brew-Loft.jpg",
+                  "9th Hole Café": "9th-Holo-Cafe.jpg",
+                };
+
+                const partners = [
+                  {
+                    name: "Greenhouse Bites",
+                    tag: "Grab & Go — Ready in 10 mins",
+                    desc: "Fresh salads, wraps, and healthy options.",
+                  },
+                  {
+                    name: "Slice & Swing Pizza Co.",
+                    tag: "Stone-oven pizza specials & combos",
+                    desc: "Artisan pizzas made fresh to order.",
+                  },
+                  {
+                    name: "The Brew Loft",
+                    tag: "On Tap & Craft Flights",
+                    desc: "Local craft beer and premium coffee selections.",
+                  },
+                  {
+                    name: "Fairway Kitchen",
+                    tag: "Daily specials & family promotions",
+                    desc: "Classic comfort dishes and casual dining favourites.",
+                  },
+                  {
+                    name: "The Celtic Grill",
+                    tag: "Chef’s signature burgers & promos",
+                    desc: "Premium burgers, fries, and shareable plates.",
+                  },
+                  {
+                    name: "Birdie Bar Co.",
+                    tag: "Happy Hour 4–9pm",
+                    desc: "Handcrafted cocktails and mocktails.",
+                  },
+                  {
+                    name: "9th Hole Café",
+                    tag: "Breakfast & Brunch 8–11am",
+                    desc: "Breakfast classics, pastries and specialty coffee.",
+                  },
+                  {
+                    name: "Cool 9 Beverages",
+                    tag: "Seasonal cold drinks & promotions",
+                    desc: "Juices, smoothies, and soft drinks.",
+                  },
+                ];
+
+                return partners.map((p) => {
+                  const file = imgByName[p.name] || "Fairway-Kitchen.jpg";
+                  const src = `/golf/images/Food/Restaurants/${file}`;
+                  return (
+                    <div
+                      key={p.name}
+                      className="rttu-card p-4 flex flex-col items-center h-full"
+                    >
+                      <div className="w-[120px] h-[120px] overflow-hidden rounded-full bg-slate-300">
+                        <img
+                          src={src}
+                          alt={p.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="mt-4 text-center">
+                        <div className="font-medium text-slate-900">
+                          {p.name}
+                        </div>
+                        <div className="text-xs text-emerald-700 mt-1">
+                          {p.tag}
+                        </div>
+                        <div className="text-sm text-slate-700 mt-2">
+                          {p.desc}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                });
+              })()}
             </div>
           </div>
         </section>

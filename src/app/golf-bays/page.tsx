@@ -9,7 +9,6 @@ export default function GolfBaysPage() {
       <div className="mx-auto max-w-7xl px-4 py-0">
         <section className="full-bleed">
           <div className="hero relative">
-            {/* background image */}
             <div
               className="absolute inset-0"
               style={{
@@ -18,51 +17,35 @@ export default function GolfBaysPage() {
                 backgroundPosition: "center",
               }}
             />
-
             <div className="absolute inset-0 bg-black/35" />
 
-            <div className="relative min-h-[62vh] sm:min-h-[66vh] lg:min-h-[70vh]">
-              <div className="mx-auto max-w-6xl lg:max-w-7xl px-4 sm:px-6 h-full">
-                <div className="h-full flex items-center sm:items-start">
-                  <div
-                    className="
-                                w-full sm:w-auto
-                                sm:mt-[14vh] lg:mt-[22vh]
-                                sm:ml-auto
-                                max-w-md sm:max-w-xl lg:max-w-2xl
-                              "
-                  >
-                    <div
-                      className={`${cardBase} bg-white/80 backdrop-blur-sm p-4 sm:p-6 md:p-8 text-sm lg:text-base shadow-2xl lg:shadow-xl`}
-                    >
-                      <span className="text-xs uppercase tracking-[0.2em] text-[color:var(--g600)]/90">
-                        Golf Bays
-                      </span>
-                      <h1 className="mt-2 mb-2 text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-[color:var(--g600)]">
-                        Explore Our Bays
-                      </h1>
-                      <p className="mt-2 mb-4 text-[14px] lg:text-[15.5px] leading-6 lg:leading-7 text-slate-700">
-                        Celtic Virtual Golf features 6 well-designed golf bays —
-                        2 premium bays for larger groups and 4 standard bays for
-                        everyday play — offered at fair and affordable rates.
-                        Each bay provides ample space, comfortable seating, and
-                        a clear view.
-                      </p>
-                      <p className="mt-2 mb-4 text-[13px] text-slate-600">
-                        Premium bays: up to 10 guests. Standard bays: up to 4
-                        guests.
-                      </p>
+            <div className="relative z-10 mx-auto max-w-6xl flex items-center min-h-[60vh] px-8 justify-start lg:pr-7 pt-8 md:pt-55">
+              <div
+                className={`${cardBase} bg-white/80 backdrop-blur-sm p-4 sm:p-6 md:p-7 w-full max-w-md sm:max-w-xl lg:max-w-2xl mx-auto lg:mx-0 text-sm lg:text-base shadow-2xl lg:shadow-xl`}
+              >
+                <span className="text-xs uppercase tracking-[0.2em] text-[color:var(--g600)]/90">
+                  Golf Bays
+                </span>
+                <h1 className="mt-2 mb-2 text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-[color:var(--g600)]">
+                  Explore Our Bays
+                </h1>
+                <p className="mt-2 mb-4 text-[14px] lg:text-[15.5px] leading-6 lg:leading-7 text-slate-700">
+                  Celtic Virtual Golf features 6 well-designed golf bays — 2
+                  premium bays for larger groups and 4 standard bays for
+                  everyday play — offered at fair and affordable rates. Each bay
+                  provides ample space, comfortable seating, and a clear view.
+                </p>
+                <p className="mt-2 mb-4 text-[13px] text-slate-600">
+                  Premium bays: up to 10 guests. Standard bays: up to 4 guests.
+                </p>
 
-                      <div className="mt-6 flex gap-3">
-                        <Link href="/dashboard" className="btn">
-                          Book Now
-                        </Link>
-                        <Link href="/signup" className="btn-secondary">
-                          Become a Member
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
+                <div className="mt-6 flex gap-3">
+                  <Link href="/dashboard" className="btn">
+                    Book Now
+                  </Link>
+                  <Link href="/signup" className="btn-secondary">
+                    Become a Member
+                  </Link>
                 </div>
               </div>
             </div>

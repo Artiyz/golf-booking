@@ -81,7 +81,7 @@ type Bay = {
 };
 type Slot = { iso: string; label: string; available: boolean };
 
-/* Hours of operation (local time). After CLOSE_HOUR, we auto-advance to tomorrow. Adjust if needed. */
+/* Hours of operation (local time). */
 const CLOSE_HOUR = 22;
 
 /* ====================== Component ====================== */
@@ -224,6 +224,19 @@ export default function Booking() {
       setStep(1);
     } catch {
       setLoginError("Network error. Please try again.");
+    }
+  }
+
+  async function handleLogout() {
+    try {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch (_) {
+    } finally {
+      signalAuthChanged();
+      setStep(1);
     }
   }
 
@@ -460,9 +473,15 @@ export default function Booking() {
                         />
                       </label>
 
-                      <div className="md:col-span-2 flex items-start pt-2">
+                      <div className="md:col-span-2 flex items-start pt-2 gap-2">
                         <button className="btn" onClick={() => setStep(2)}>
                           Continue
+                        </button>
+                        <button
+                          className="btn-secondary"
+                          onClick={handleLogout}
+                        >
+                          Log out
                         </button>
                       </div>
                     </div>
@@ -484,7 +503,7 @@ export default function Booking() {
             </section>
           )}
 
-          {/* ==== STEP 2: Only services + “Check availability” ==== */}
+          {/* ==== STEP 2: Services ==== */}
           {step === 2 && (
             <section className="space-y-6">
               <div className="space-y-3">
@@ -525,7 +544,7 @@ export default function Booking() {
                 </div>
               </div>
 
-              {/* Show the button ONLY after a service is picked */}
+              {/* Show the button only after a service is picked */}
               {service && (
                 <div className="pt-2">
                   <button className="btn" onClick={() => setStep(3)}>
@@ -542,7 +561,7 @@ export default function Booking() {
             </section>
           )}
 
-          {/* ==== STEP 3: Date picker + equal-height service card, then bay list (validated), then times ==== */}
+          {/* ==== STEP 3: Date picker + bay list (validated), then times ==== */}
           {step === 3 && service && (
             <section className="space-y-6">
               {/* Equal-height two-column row */}

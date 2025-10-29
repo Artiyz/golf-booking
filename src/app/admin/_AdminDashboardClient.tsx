@@ -180,7 +180,7 @@ export default function AdminDashboardClient() {
   }, [bays, bookings]);
 
   return (
-    <div className="space-y-6 pb-10">
+    <div className="space-y-5 pb-10">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-[color:var(--g600)]">
           Admin
@@ -199,7 +199,7 @@ export default function AdminDashboardClient() {
         </div>
       </div>
 
-      {/* Date picker + Bay overview table (original height restored) */}
+      {/* Date picker + Bay overview table */}
       <div className="grid md:grid-cols-[340px_minmax(0,1fr)] gap-4 items-stretch">
         <div className="panel max-w-md min-h-[400px]">
           <h3 className="font-medium text-[color:var(--g600)] mb-2">
@@ -300,8 +300,7 @@ export default function AdminDashboardClient() {
           </div>
         </div>
 
-        {/* No green shadow; ensure it never exits the viewport */}
-        <div className="max-h-[calc(100vh-48.5rem)] overflow-y-auto rounded-xl ring-1 ring-emerald-900/10 bg-white/60 p-2 pt-3 pb-2 overscroll-contain">
+        <div className="max-h-[calc(100vh-47rem)] overflow-y-auto rounded-xl ring-1 ring-emerald-900/10 bg-white/60 p-2 pt-3 pb-2 overscroll-contain">
           <div className="space-y-3">
             {filteredBookings.map((b) => {
               const start = new Date(b.startTime);

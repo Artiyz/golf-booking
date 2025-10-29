@@ -48,7 +48,7 @@ export default function AboutPage() {
           <div className="absolute inset-0 bg-black/35" />
           <div className="relative z-10 mx-auto max-w-6xl flex items-center min-h-[60vh] px-8 justify-start lg:pr-7 pt-8 md:pt-55">
             <div
-              className={`${cardBase} bg-white/85 backdrop-blur-[2px] p-4 sm:p-6 md:p-7 w-full max-w-md sm:max-w-xl lg:max-w-2xl mx-auto lg:mx-0 text-sm lg:text-base shadow-2xl lg:shadow-xl`}
+              className={`${cardBase} bg-white/85 backdrop-blur-[2px] p-4 sm:p-6 md:p-6 w-full max-w-md sm:max-w-xl lg:max-w-2xl mx-auto lg:mx-0 text-sm lg:text-base shadow-2xl lg:shadow-xl`}
             >
               <span className="text-xs uppercase tracking-[0.2em] text-[color:var(--g600)]/90">
                 About Us

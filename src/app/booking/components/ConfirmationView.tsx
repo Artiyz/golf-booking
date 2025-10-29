@@ -209,7 +209,7 @@ export function ConfirmationView({
           Change time
         </button>
         <button
-          className="btn-secondary btn-ghost"
+          className="btn btn-ghost"
           onClick={() => setShowEmail((v) => !v)}
         >
           {showEmail ? "Hide confirmation email" : "Show confirmation email"}

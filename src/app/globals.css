@@ -170,6 +170,13 @@
   border-color:var(--select-green);
   box-shadow:0 -1px 8px rgba(0,0,0,.06),0 14px 26px rgba(0,0,0,.16);
 }
+
+.no-contacts::-webkit-contacts-auto-fill-button {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
 .time-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem}
 @media (min-width:640px){.time-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (min-width:768px){.time-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}

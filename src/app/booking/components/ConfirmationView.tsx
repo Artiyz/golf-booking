@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { format, parseISO, addMinutes } from "date-fns";
+import React from "react";
 
 type Customer = {
   firstName?: string;
@@ -9,12 +10,14 @@ type Customer = {
   email: string;
   phone?: string;
 };
+
 type Service = {
   id: string;
   name: string;
   durationMinutes: number;
   priceCents: number;
 };
+
 type Bay = {
   id: string;
   name: string;
@@ -93,6 +96,7 @@ export function ConfirmationView({
 }: Props) {
   const [showEmail, setShowEmail] = useState(false);
   const [sending, setSending] = useState(false);
+  const [blockMsg, setBlockMsg] = useState<string | null>(null);
 
   const start = useMemo(() => parseISO(startISO), [startISO]);
   const end = useMemo(
@@ -159,10 +163,37 @@ export function ConfirmationView({
   async function handleConfirm() {
     setSending(true);
     try {
+      // Check user state BEFORE confirming
+      const r = await fetch("/api/me/state", {
+        cache: "no-store",
+        credentials: "include",
+      });
+      const j = await r.json().catch(() => ({} as any));
+      const state = j?.state as
+        | "REGULAR"
+        | "PREMIUM"
+        | "NO_SHOW"
+        | "BLACKLISTED"
+        | undefined;
+
+      if (state === "BLACKLISTED" || state === "NO_SHOW") {
+        setBlockMsg(
+          "Booking is restricted for this user. Please contact administration at 613-456-9824."
+        );
+        return; // do not proceed
+      }
+
       await onConfirm();
     } finally {
       setSending(false);
     }
+  }
+
+  function goFirstStep() {
+    setBlockMsg(null);
+    try {
+      window.dispatchEvent(new CustomEvent("booking:goto", { detail: 1 }));
+    } catch {}
   }
 
   const tileCls =
@@ -209,7 +240,7 @@ export function ConfirmationView({
           Change time
         </button>
         <button
-          className="btn btn-ghost"
+          className="btn-secondary btn-ghost"
           onClick={() => setShowEmail((v) => !v)}
         >
           {showEmail ? "Hide confirmation email" : "Show confirmation email"}
@@ -235,6 +266,33 @@ export function ConfirmationView({
             className="p-4 bg-white"
             dangerouslySetInnerHTML={{ __html: emailHtml }}
           />
+        </div>
+      )}
+
+      {blockMsg && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="absolute inset-0 bg-black/25" />
+          <div className="relative z-10 w-[92%] max-w-md rounded-2xl bg-white shadow-2xl ring-1 ring-black/10">
+            <div className="px-5 pt-5">
+              <h4 className="text-[17px] font-semibold text-orange-600">
+                Booking Restricted
+              </h4>
+            </div>
+
+            <div className="px-5 py-4 text-[13.5px] leading-6 text-slate-700">
+              {blockMsg}
+            </div>
+
+            <div className="flex justify-end gap-2 px-5 pb-5">
+              <button className="btn-secondary" onClick={goFirstStep}>
+                Close
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

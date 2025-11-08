@@ -6,19 +6,30 @@ import { cookies } from "next/headers";
 import { getIronSession } from "iron-session";
 import { sessionOptions } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import { UserState } from "@prisma/client";
 
-const ALLOWED = new Set(["REGULAR", "PREMIUM", "BLACKLISTED", "NO_SHOW"]);
+function isUserState(v: string): v is UserState {
+  return ["REGULAR", "PREMIUM", "BLACKLISTED", "NO_SHOW"].includes(v);
+}
 
 async function requireAdmin() {
-  const cookieStore = await cookies();
-  const session = await getIronSession<SessionData>(cookieStore, sessionOptions as any);
+  const session = await getIronSession<SessionData>(
+    await cookies(),
+    sessionOptions as any
+  );
   if (session?.user?.role !== "ADMIN") {
-    return { ok: false as const, res: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
+    return {
+      ok: false as const,
+      res: NextResponse.json({ error: "Unauthorized" }, { status: 401 }),
+    };
   }
   return { ok: true as const };
 }
 
-export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+export async function GET(
+  _req: NextRequest,
+  ctx: { params: Promise<{ id: string }> }
+) {
   const guard = await requireAdmin();
   if (!guard.ok) return guard.res;
 
@@ -26,22 +37,30 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string
 
   const user = await prisma.user.findUnique({
     where: { id },
-    select: { id: true, firstName: true, lastName: true, email: true, phone: true, state: true },
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      email: true,
+      phone: true,
+      state: true,
+    },
   });
   if (!user) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  // Use LOWER-CASE relation names that your current Prisma Client exposes
+  const comments = await prisma.userComment.findMany({
+    where: { userId: id },
+    select: { id: true, text: true, createdAt: true },
+    orderBy: { createdAt: "desc" },
+  });
+
   const rows = await prisma.booking.findMany({
     where: { customer: { email: user.email || "" } },
-    include: {
-      bay: true,
-      service: true,
-    },
+    include: { bay: true, service: true },
     orderBy: { startTime: "desc" },
     take: 100,
   });
 
-  // Keep the response shape the same as before
   const bookings = rows.map((b) => ({
     id: b.id,
     startTime: b.startTime,
@@ -52,44 +71,129 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string
     checkedIn: (b as any).checkedIn ?? false,
     bay: b.bay ? { name: b.bay.name } : null,
     service: b.service
-      ? { name: b.service.name, durationMinutes: (b.service as any).durationMinutes }
+      ? {
+          name: b.service.name,
+          durationMinutes: (b.service as any).durationMinutes,
+        }
       : null,
   }));
 
-  return NextResponse.json({ user, bookings });
+  return NextResponse.json({ user, bookings, comments });
 }
 
-export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+export async function PUT(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   const guard = await requireAdmin();
   if (!guard.ok) return guard.res;
 
-  const { id } = await ctx.params;
+  const { id } = await params;
+  const body = await req.json().catch(() => ({} as any));
 
-  let payload: any = {};
-  try {
-    payload = await req.json();
-  } catch {}
-  const raw = String(payload?.state ?? "REGULAR").trim();
-  const state = raw.toUpperCase().replace(/\s+/g, "_"); // "No show" -> "NO_SHOW"
+  const nextStateRaw: string | undefined = body?.state;
+  const codeFromClient: string = String(body?.code ?? "").trim();
 
-  if (!ALLOWED.has(state)) {
-    return NextResponse.json({ error: "Invalid state" }, { status: 400 });
+  if (!nextStateRaw) {
+    return NextResponse.json({ error: "state is required" }, { status: 400 });
   }
 
-  await prisma.user.update({ where: { id }, data: { state: state as any } });
-  return NextResponse.json({ ok: true });
+  const NEXT = nextStateRaw.toUpperCase();
+  if (!isUserState(NEXT)) {
+    return NextResponse.json({ error: "invalid_state" }, { status: 400 });
+  }
+
+  // Check current state to decide if code is required
+  const user = await prisma.user.findUnique({
+    where: { id },
+    select: { state: true },
+  });
+  if (!user) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+  const CURRENT = (user.state || "REGULAR") as UserState;
+  const involvesBlacklist =
+    (CURRENT !== "BLACKLISTED" && NEXT === "BLACKLISTED") ||
+    (CURRENT === "BLACKLISTED" && NEXT !== "BLACKLISTED");
+
+  if (involvesBlacklist) {
+    // Same env var as comment deletion
+    const expected = (process.env.ADMIN_DELETE_CODE || "").trim();
+    if (!expected) {
+      return NextResponse.json(
+        { error: "Admin delete code is not configured" },
+        { status: 500 }
+      );
+    }
+    if (!codeFromClient) {
+      return NextResponse.json(
+        { error: "verification_code_required" },
+        { status: 400 }
+      );
+    }
+    if (codeFromClient !== expected) {
+      return NextResponse.json(
+        { error: "invalid_verification_code" },
+        { status: 403 }
+      );
+    }
+  }
+
+  const updated = await prisma.user.update({
+    where: { id },
+    data: { state: NEXT as UserState },
+    select: { id: true, state: true },
+  });
+
+  return NextResponse.json({ ok: true, user: updated }, { status: 200 });
 }
 
-export async function DELETE(_req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+export async function DELETE(
+  req: NextRequest,
+  ctx: { params: Promise<{ id: string }> }
+) {
   const guard = await requireAdmin();
   if (!guard.ok) return guard.res;
+
+  // Use the SAME env var as comments + PUT
+  const expected = (process.env.ADMIN_DELETE_CODE || "").trim();
+  if (!expected) {
+    return NextResponse.json(
+      { error: "Admin delete code is not configured" },
+      { status: 500 }
+    );
+  }
+
+  let body: unknown;
+  try {
+    body = await req.json();
+  } catch {
+    // ignore
+  }
+  const code = String((body as any)?.code ?? "").trim();
+
+  if (!code) {
+    return NextResponse.json(
+      { error: "verification_code_required" },
+      { status: 400 }
+    );
+  }
+  if (code !== expected) {
+    return NextResponse.json(
+      { error: "invalid_verification_code" },
+      { status: 403 }
+    );
+  }
 
   const { id } = await ctx.params;
 
   try {
+    await prisma.userComment.deleteMany({ where: { userId: id } });
     await prisma.user.delete({ where: { id } });
     return NextResponse.json({ ok: true });
   } catch {
-    return NextResponse.json({ error: "Cannot delete this user (has related records)" }, { status: 409 });
+    return NextResponse.json(
+      { error: "Cannot delete this user (has related records)" },
+      { status: 409 }
+    );
   }
 }

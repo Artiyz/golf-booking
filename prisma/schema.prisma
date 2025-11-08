@@ -85,15 +85,27 @@ model Booking {
   @@index([startTime, endTime])
 }
 
+model UserComment {
+  id        String   @id @default(cuid())
+  userId    String
+  text      String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, createdAt])
+}
+
 model User {
   id           String     @id @default(cuid())
   firstName    String?
   lastName     String?
   email        String     @unique
-  phone        String?    @unique     // DB already had a unique index on phone
-  role         String                  // "ADMIN" | "USER"
+  phone        String?    @unique     
+  role         String                 
   state        UserState  @default(REGULAR)
   passwordHash String
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
+  comments     UserComment[]
 }

@@ -323,7 +323,7 @@ export default function Booking() {
 
   /* ====================== UI ====================== */
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="mx-auto max-w-3xl mt-5">
       <div className="steps-shell">
         <div className="steps-grid">
           {["Contact", "Service", "Availability", "Confirmation"].map(

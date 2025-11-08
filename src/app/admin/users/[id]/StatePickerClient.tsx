@@ -4,21 +4,29 @@ import { useRouter } from "next/navigation";
 
 type Props = {
   userId: string;
-  initialState: "REGULAR" | "PREMIUM" | "BLACKLISTED" | "NO_SHOW";
+  initialState: "REGULAR" | "PREMIUM" | "NO_SHOW" | "BLACKLISTED";
 };
 
+// Blacklisted moved to the end
 const STATE_OPTIONS = [
   { value: "REGULAR", label: "Regular (default)", dot: "bg-emerald-600" },
   { value: "PREMIUM", label: "Premium", dot: "bg-indigo-600" },
-  { value: "BLACKLISTED", label: "Blacklisted", dot: "bg-red-600" },
   { value: "NO_SHOW", label: "No-show", dot: "bg-orange-500" },
+  { value: "BLACKLISTED", label: "Blacklisted", dot: "bg-red-600" },
 ] as const;
 
 export default function StatePickerClient({ userId, initialState }: Props) {
   const [state, setState] = useState<Props["initialState"]>(initialState);
+  const [originalState, setOriginalState] =
+    useState<Props["initialState"]>(initialState);
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
+
+  // inline errors
   const [err, setErr] = useState<string | null>(null);
+  const [code, setCode] = useState("");
+  const [codeErr, setCodeErr] = useState<string | null>(null);
+
   const router = useRouter();
   const popRef = useRef<HTMLDivElement>(null);
 
@@ -26,6 +34,11 @@ export default function StatePickerClient({ userId, initialState }: Props) {
     () => STATE_OPTIONS.find((o) => o.value === state) ?? STATE_OPTIONS[0],
     [state]
   );
+
+  // Require admin code if moving into/out of BLACKLISTED
+  const requireCode =
+    (originalState !== "BLACKLISTED" && state === "BLACKLISTED") ||
+    (originalState === "BLACKLISTED" && state !== "BLACKLISTED");
 
   useEffect(() => {
     function onDoc(e: MouseEvent) {
@@ -45,18 +58,41 @@ export default function StatePickerClient({ userId, initialState }: Props) {
 
   async function save() {
     setErr(null);
+    setCodeErr(null);
+
+    if (requireCode && !code.trim()) {
+      setCodeErr("Verification code required");
+      return;
+    }
+
     setBusy(true);
     try {
+      const body: Record<string, unknown> = { state };
+      if (requireCode) body.code = code.trim();
+
       const r = await fetch(`/api/admin/users/${userId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "same-origin",
-        body: JSON.stringify({ state }),
+        body: JSON.stringify(body),
       });
+
+      const j = await r.json().catch(() => ({} as any));
+
       if (!r.ok) {
-        const j = await r.json().catch(() => ({}));
-        throw new Error(j?.error || "Failed to update state");
+        if (j?.error === "verification_code_required") {
+          setCodeErr("Verification code required");
+        } else if (j?.error === "invalid_verification_code") {
+          setCodeErr("Invalid verification code");
+        } else if (j?.error === "Admin delete code is not configured") {
+          setCodeErr("Server not configured with admin code");
+        } else {
+          setErr(j?.error || "Failed to update state");
+        }
+        return;
       }
+
+      // Success
       if (typeof window !== "undefined") {
         window.dispatchEvent(
           new CustomEvent("statepicker:saved", {
@@ -68,45 +104,16 @@ export default function StatePickerClient({ userId, initialState }: Props) {
           })
         );
       }
+      setOpen(false);
+      setOriginalState(state);
+      setCode("");
       router.refresh();
     } catch (e: any) {
       const message = e?.message || "Failed to update";
       setErr(message);
       if (typeof window !== "undefined") {
         window.dispatchEvent(
-          new CustomEvent("statepicker:error", {
-            detail: { message },
-          })
-        );
-      }
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function removeUser() {
-    if (!confirm("Delete this user? This cannot be undone.")) return;
-    setErr(null);
-    setBusy(true);
-    try {
-      const r = await fetch(`/api/admin/users/${userId}`, {
-        method: "DELETE",
-        credentials: "same-origin",
-      });
-      if (!r.ok) {
-        const j = await r.json().catch(() => ({}));
-        throw new Error(j?.error || "Failed to delete user");
-      }
-      router.replace("/admin/users");
-      router.refresh();
-    } catch (e: any) {
-      const message = e?.message || "Failed to delete";
-      setErr(message);
-      if (typeof window !== "undefined") {
-        window.dispatchEvent(
-          new CustomEvent("statepicker:error", {
-            detail: { message },
-          })
+          new CustomEvent("statepicker:error", { detail: { message } })
         );
       }
     } finally {
@@ -115,7 +122,8 @@ export default function StatePickerClient({ userId, initialState }: Props) {
   }
 
   return (
-    <div className="flex w-full flex-wrap items-center gap-3">
+    // keep items on one line; code is narrow; allow wrap on tiny screens
+    <div className="flex w-full items-center gap-3 flex-wrap">
       <div ref={popRef} className="relative">
         <button
           type="button"
@@ -132,6 +140,7 @@ export default function StatePickerClient({ userId, initialState }: Props) {
             className={`h-4 w-4 transition ${open ? "rotate-180" : ""}`}
             viewBox="0 0 20 20"
             fill="currentColor"
+            aria-hidden="true"
           >
             <path d="M5.25 7.5l4.5 4.5 4.5-4.5" />
           </svg>
@@ -167,6 +176,7 @@ export default function StatePickerClient({ userId, initialState }: Props) {
                           className="h-4 w-4 text-emerald-600"
                           viewBox="0 0 20 20"
                           fill="currentColor"
+                          aria-hidden="true"
                         >
                           <path
                             fillRule="evenodd"
@@ -184,26 +194,50 @@ export default function StatePickerClient({ userId, initialState }: Props) {
         )}
       </div>
 
-      <div className="ml-auto flex items-center gap-2">
-        <button
-          type="button"
-          className="btn"
-          onClick={save}
-          disabled={busy}
-          title="Save user state"
-        >
-          {busy ? "Saving…" : "Save"}
-        </button>
-        <button
-          type="button"
-          className="btn-secondary"
-          onClick={removeUser}
-          disabled={busy}
-          title="Delete this user"
-        >
-          Delete user
-        </button>
-      </div>
+      <button
+        type="button"
+        onClick={save}
+        disabled={busy}
+        className="btn"
+        aria-label="Save state"
+      >
+        {busy ? "Saving…" : "Save"}
+      </button>
+
+      {requireCode && (
+        <div className="flex flex-col whitespace-nowrap">
+          <div className="flex items-center gap-2">
+            <label htmlFor="admin-code" className="text-xs text-slate-600">
+              Code
+            </label>
+            <input
+              id="admin-code"
+              value={code}
+              onChange={(e) => {
+                setCode(e.target.value);
+                if (codeErr) setCodeErr(null);
+              }}
+              inputMode="numeric"
+              pattern="[0-9]*"
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="none"
+              spellCheck={false}
+              className="input h-9 w-20"
+              placeholder="1234"
+              aria-label="Verification code"
+            />
+          </div>
+          {codeErr && (
+            <span
+              className="mt-1.5 text-xs px-2 py-1 rounded-md border border-red-200 bg-red-50 text-red-700"
+              role="alert"
+            >
+              {codeErr}
+            </span>
+          )}
+        </div>
+      )}
 
       {err && <span className="text-sm text-red-600">{err}</span>}
     </div>

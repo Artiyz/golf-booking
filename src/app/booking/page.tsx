@@ -19,7 +19,6 @@ import { addDays, format } from "date-fns";
 import { ConfirmationView } from "./components/ConfirmationView";
 import Image from "next/image";
 
-/* ====================== Helpers ====================== */
 function parseUser(u?: Me | null): {
   first: string;
   last: string;
@@ -141,7 +140,7 @@ export default function Booking() {
   const [bayHasAvail, setBayHasAvail] = useState<Record<string, boolean>>({});
   const [loadingBays, setLoadingBays] = useState(false);
   const [slotISO, setSlotISO] = useState<string | null>(null);
-  const [guestNotice, setGuestNotice] = useState<string | null>(null);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -321,7 +320,6 @@ export default function Booking() {
     return { firstName, lastName, email: wEmail || "", phone: wPhone || "" };
   }, [isAuthed, me, wFullName, wEmail, wPhone]);
 
-  /* ====================== UI ====================== */
   return (
     <div className="mx-auto max-w-3xl mt-5">
       <div className="steps-shell">
@@ -564,7 +562,6 @@ export default function Booking() {
           {/* ==== STEP 3: Date picker + bay list (validated), then times ==== */}
           {step === 3 && service && (
             <section className="space-y-6">
-              {/* Equal-height two-column row */}
               <div className="grid md:grid-cols-2 gap-6 items-stretch">
                 <div className="h-full">
                   <h4 className="font-medium text-[color:var(--g600)] mb-2">
@@ -680,11 +677,11 @@ export default function Booking() {
                         onClick={() => {
                           if (!s.available) return;
                           if (!isAuthed) {
-                            setGuestNotice("Please log in to make a booking.");
+                            setShowAuthDialog(true);
                             return;
                           }
                           setSlotISO(s.iso);
-                          setGuestNotice(null);
+                          setShowAuthDialog(false);
                           setStep(4);
                         }}
                         className={
@@ -701,9 +698,6 @@ export default function Booking() {
                       <p className="text-sm opacity-75">No times available.</p>
                     )}
                   </div>
-                  {guestNotice && (
-                    <p className="mt-2 text-sm text-red-600">{guestNotice}</p>
-                  )}
                 </div>
               )}
             </section>
@@ -722,6 +716,50 @@ export default function Booking() {
           )}
         </div>
       </div>
+
+      {/* Auth required dialog for guests picking a time */}
+      {showAuthDialog && (
+        <div
+          className="fixed inset-0 z-[120] flex items-center justify-center bg-black/40 p-4"
+          onClick={() => setShowAuthDialog(false)}
+        >
+          <div
+            className="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl ring-1 ring-black/10"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h4 className="text-lg font-semibold text-emerald-900">
+              Log in to make a booking
+            </h4>
+            <p className="mt-2 text-sm text-slate-700">
+              To reserve this time, please log in or sign up in. Once you’re
+              logged in, you can come back here and book your time.
+            </p>
+
+            <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                className="rounded-xl px-4 py-2 text-sm font-medium border border-slate-200 text-slate-700 hover:bg-slate-50"
+                onClick={() => setShowAuthDialog(false)}
+              >
+                Keep browsing times
+              </button>
+              <button
+                type="button"
+                className="rounded-xl px-4 py-2 text-sm font-semibold bg-[color:var(--g600)] text-white hover:bg-emerald-700"
+                onClick={() => {
+                  setShowAuthDialog(false);
+                  setStep(1);
+                  if (typeof window !== "undefined") {
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }
+                }}
+              >
+                Log in
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

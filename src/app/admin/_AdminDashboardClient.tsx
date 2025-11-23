@@ -159,18 +159,21 @@ export default function AdminDashboardClient() {
       const bks = bookings.filter(
         (b) => (b.bay?.name || "").toLowerCase() === bay.name.toLowerCase()
       );
-      const confirmed = bks.filter((b) => b.status === "CONFIRMED");
+
+      const checkedIn = bks.filter((b) => !!b.checkedIn);
       const canceled = bks.filter((b) => b.status === "CANCELED");
+
       const first = bks.length
         ? dfMin(bks.map((b) => new Date(b.startTime)))
         : null;
       const last = bks.length
         ? dfMax(bks.map((b) => new Date(b.endTime)))
         : null;
+
       return {
         bay,
         count: bks.length,
-        confirmed: confirmed.length,
+        checkedIn: checkedIn.length,
         canceled: canceled.length,
         first,
         last,
@@ -228,7 +231,7 @@ export default function AdminDashboardClient() {
                   <th className="px-3 py-2 font-medium">Type</th>
                   <th className="px-3 py-2 font-medium">Cap</th>
                   <th className="px-3 py-2 font-medium">Bookings</th>
-                  <th className="px-3 py-2 font-medium">Confirmed</th>
+                  <th className="px-3 py-2 font-medium">Checked-in</th>
                   <th className="px-3 py-2 font-medium">Canceled</th>
                   <th className="px-3 py-2 font-medium">First</th>
                   <th className="px-3 py-2 font-medium">Last</th>
@@ -247,7 +250,7 @@ export default function AdminDashboardClient() {
                         {r.count}
                       </span>
                     </td>
-                    <td className="px-3 py-2">{r.confirmed}</td>
+                    <td className="px-3 py-2">{r.checkedIn}</td>
                     <td className="px-3 py-2">{r.canceled}</td>
                     <td className="px-3 py-2">
                       {r.first ? format(r.first, "p") : "—"}
@@ -406,9 +409,11 @@ export default function AdminDashboardClient() {
                     </div>
                   </div>
 
-                  {isCanceled && b.cancelReason && (
+                  {b.cancelReason && (
                     <div className="mt-2 text-sm">
-                      <span className="opacity-60">Cancel reason: </span>
+                      <span className="opacity-60">
+                        {isCanceled ? "Cancel reason: " : "Note: "}
+                      </span>
                       <span className="italic">{b.cancelReason}</span>
                     </div>
                   )}
@@ -443,8 +448,9 @@ export default function AdminDashboardClient() {
               <button
                 className="w-full rounded-xl px-4 py-2 bg-emerald-50 text-emerald-800 ring-1 ring-emerald-200 shadow-sm hover:bg-emerald-100 transition"
                 onClick={async () => {
-                  await doAction(activeId!, "checkin");
+                  await doAction(activeId!, "checkin", comment || undefined);
                   setActiveId(null);
+                  setComment("");
                 }}
               >
                 Mark as Checked-in
@@ -458,7 +464,7 @@ export default function AdminDashboardClient() {
                   className="w-full min-h-[110px] rounded-xl bg-white px-3 py-2 shadow-inner ring-1 ring-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
                 <button
-                  className="w-full rounded-xl px-4 py-2 bg-red-600 text-white shadow hover:bg-red-700 transition"
+                  className="w-full rounded-xl px-4 py-2 bg-red-700 text-white shadow hover:bg-red-600 transition"
                   onClick={async () => {
                     await doAction(activeId!, "cancel", comment || undefined);
                     setActiveId(null);

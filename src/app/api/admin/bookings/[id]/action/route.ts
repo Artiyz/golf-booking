@@ -16,7 +16,13 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
   const { action, comment } = await req.json().catch(() => ({}));
 
   if (action === "checkin") {
-    await prisma.booking.update({ where: { id }, data: { checkedIn: true } });
+    await prisma.booking.update({
+      where: { id },
+      data: {
+        checkedIn: true,
+        cancelReason: comment ?? null,
+      },
+    });
     return NextResponse.json({ ok: true });
   }
 
